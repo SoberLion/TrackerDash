@@ -11,7 +11,7 @@ using TrackerHelper.DB;
 
 namespace TrackerHelper.Controls
 {
-    public partial class DashboardIssuesStatus : UserControl
+    public partial class DashboardIssuesStatus : UserControl, IDashboardControlsUpdate
     {
         static string _dateFormat = "yyyy-MM-dd HH:mm:ss:fff";
         private int[] _userIdList = new int[] { 2361, 2374, 1830, 2233, 1240, 1383, 2886, 2235, 1521, 2232, 1537, 2535, 551, 894, 3713, 328, 751, 2270 };
@@ -104,6 +104,12 @@ namespace TrackerHelper.Controls
                 dgvIssuesStatus.Columns["Назначена"].DefaultCellStyle.Font = font;
                 dgvIssuesStatus.ColumnHeadersDefaultCellStyle.Font = font;
             }
+        }
+
+        public void ControlUpdate()
+        {
+            GetDataTable();
+            BringToFront();
         }
     }
 }

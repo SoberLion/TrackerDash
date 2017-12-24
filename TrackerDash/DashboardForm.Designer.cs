@@ -183,16 +183,16 @@
             // 
             // pbBGWork
             // 
-            this.pbBGWork.Dock = System.Windows.Forms.DockStyle.Right;
+            this.pbBGWork.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.pbBGWork.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.pbBGWork.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(88)))), ((int)(((byte)(86)))));
-            this.pbBGWork.Location = new System.Drawing.Point(418, 0);
+            this.pbBGWork.Location = new System.Drawing.Point(638, 14);
             this.pbBGWork.Margin = new System.Windows.Forms.Padding(11, 9, 11, 9);
             this.pbBGWork.Name = "pbBGWork";
             this.pbBGWork.ProgressColor = System.Drawing.Color.FromArgb(((int)(((byte)(21)))), ((int)(((byte)(33)))), ((int)(((byte)(45)))));
             this.pbBGWork.ProgressText = "";
             this.pbBGWork.ProgressValue = 0;
-            this.pbBGWork.Size = new System.Drawing.Size(525, 50);
+            this.pbBGWork.Size = new System.Drawing.Size(304, 21);
             this.pbBGWork.TabIndex = 3;
             // 
             // chbtn_Settings

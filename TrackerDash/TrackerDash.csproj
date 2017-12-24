@@ -88,6 +88,7 @@
     <Compile Include="Controls\CustomProgressBar.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Interfaces\IDashboardControlsUpdate.cs" />
     <Compile Include="Controls\DashboardIssues.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -186,12 +187,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Resources\appbar.close.png" />
-    <Content Include="Resources\arrow.down.png" />
-    <Content Include="Resources\home.png" />
-    <Content Include="Resources\ucs_logo.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">

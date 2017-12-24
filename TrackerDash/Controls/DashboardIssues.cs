@@ -12,7 +12,7 @@ using System.Threading;
 
 namespace TrackerHelper.Controls
 {
-    public partial class DashboardIssues : UserControl
+    public partial class DashboardIssues : UserControl, IDashboardControlsUpdate
     {
         /*static string cartesianAssigned = @"";
         static string cartesianNew = @"";
@@ -642,6 +642,12 @@ namespace TrackerHelper.Controls
         {
             tmrSplash.Enabled = false;
             pnlSplash.Visible = false;
+        }
+
+        public void ControlUpdate()
+        {
+            UpdateTSDashboard();
+            BringToFront();
         }
     }
 }

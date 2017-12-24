@@ -15,6 +15,7 @@ namespace TrackerHelper
 {
     public partial class Dashboard : Form
     {
+        private List<IDashboardControlsUpdate> _dashboardList = new List<IDashboardControlsUpdate>();
 
         public const int WM_NCLBUTTONDOWN = 0xA1;
         public const int HT_CAPTION = 0x2;
@@ -68,60 +69,9 @@ namespace TrackerHelper
            // e.Cancel = false;
         }
 
-
         private void pnlHeader_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            this.WindowState = this.WindowState == FormWindowState.Maximized ? FormWindowState.Normal : FormWindowState.Maximized;
-        }
-
-        private void btnTechSupp_Click(object sender, EventArgs e)
-        {
-            Toggle(sender);
-            lblCaption.Text = "ISSUES";
-
-            DashboardIssues dash = Controls.Find("DashboardIssues", true).FirstOrDefault() as DashboardIssues;
-
-            if (dash != null)
-            {
-                dash.BringToFront();
-            }
-            else
-            {
-                DashboardIssues newDash = new DashboardIssues
-                {
-                    Parent = this.pnlDashboard,
-                    Dock = DockStyle.Fill,
-                    BackColor = Color.FromArgb(41, 53, 65),
-                    Name = "DashboardIssues"
-                };
-                newDash.UpdateTSDashboard();
-                newDash.BringToFront();
-            }
-        }
-
-        private void btn1_Click(object sender, EventArgs e)
-        {
-            lblCaption.Text = "Новые";
-            Toggle(sender);
-
-            DashboardIssuesStatus dash = Controls.Find("Новые", true).FirstOrDefault() as DashboardIssuesStatus;
-            if (dash != null)
-            {
-                dash.BringToFront();
-            }
-            else
-            {
-                DashboardIssuesStatus newDash = new DashboardIssuesStatus
-                {
-                    Parent = this.pnlDashboard,
-                    Dock = DockStyle.Fill,
-                    BackColor = Color.FromArgb(255, 53, 65),
-                    Name = "Новые",
-                    StatusIdList = new int[] { 1 }
-                };
-                newDash.GetDataTable();
-                newDash.BringToFront();
-            }
+            WindowState = WindowState == FormWindowState.Maximized ? FormWindowState.Normal : FormWindowState.Maximized;
         }
 
         private void Toggle(object sender)
@@ -143,29 +93,28 @@ namespace TrackerHelper
             (sender as CheckedButton).BackColor = Color.FromArgb(21, 33, 45);
         }
 
+        private void btnTechSupp_Click(object sender, EventArgs e)
+        {
+            Toggle(sender);
+            lblCaption.Text = "Задачи";
+
+            getDashboardIssues().ControlUpdate();
+        }
+
+        private void btn1_Click(object sender, EventArgs e)
+        {
+            lblCaption.Text = "Новые";
+            Toggle(sender);
+
+            getIssuesStatus("Новые", 1).ControlUpdate();
+        }
+
         private void btnAssigned_Click(object sender, EventArgs e)
         {
             lblCaption.Text = "Назначена";
             Toggle(sender);
 
-            DashboardIssuesStatus dash = Controls.Find("Назначена", true).FirstOrDefault() as DashboardIssuesStatus;
-            if (dash != null)
-            {
-                dash.BringToFront();
-            }
-            else
-            {
-                DashboardIssuesStatus newDash = new DashboardIssuesStatus
-                {
-                    Parent = this.pnlDashboard,
-                    Dock = DockStyle.Fill,
-                    BackColor = Color.FromArgb(41, 53, 65),
-                    Name = "Назначена",
-                    StatusIdList = new int[] { 9 }
-                };
-                newDash.GetDataTable();
-                newDash.BringToFront();
-            }
+            getIssuesStatus("Назначена", 9).ControlUpdate();
         }
 
         private void btnNeedInfoEmpl_Click(object sender, EventArgs e)
@@ -173,24 +122,7 @@ namespace TrackerHelper
             lblCaption.Text = "Нужна информация (сотрудники)";
             Toggle(sender);
 
-            DashboardIssuesStatus dash = Controls.Find("Нужна информация (сотрудники)", true).FirstOrDefault() as DashboardIssuesStatus;
-            if (dash != null)
-            {
-                dash.BringToFront();
-            }
-            else
-            {
-                DashboardIssuesStatus newDash = new DashboardIssuesStatus
-                {
-                    Parent = this.pnlDashboard,
-                    Dock = DockStyle.Fill,
-                    BackColor = Color.FromArgb(41, 53, 65),
-                    Name = "Нужна информация (сотрудники)",
-                    StatusIdList = new int[] { 18 }
-                };
-                newDash.GetDataTable();
-                newDash.BringToFront();
-            }
+            getIssuesStatus("Нужна информация (сотрудники)", 18).ControlUpdate();
         }
 
         private void btnEscalated_Click(object sender, EventArgs e)
@@ -198,25 +130,8 @@ namespace TrackerHelper
             lblCaption.Text = "Эскалирована";
             Toggle(sender);
 
-            DashboardIssuesStatus dash = Controls.Find("Эскалирована", true).FirstOrDefault() as DashboardIssuesStatus;
-            if (dash != null)
-            {
-                dash.BringToFront();
-            }
-            else
-            {
-                DashboardIssuesStatus newDash = new DashboardIssuesStatus
-                {
-                    Parent = this.pnlDashboard,
-                    Dock = DockStyle.Fill,
-                    BackColor = Color.FromArgb(41, 53, 65),
-                    Name = "Эскалирована",
-                    StatusIdList = new int[] { 22 }
-                };
-                newDash.GetDataTable();
-                newDash.BringToFront();
-            }
-        }
+            getIssuesStatus("Эскалирована", 22).ControlUpdate();
+         }
 
         private void chbtn_Settings_Click(object sender, EventArgs e)
         {
@@ -247,7 +162,7 @@ namespace TrackerHelper
         {
             DBman.CreateDatabase();
             timer.Enabled = true;
-            timer.Interval = 30000/100;
+            timer.Interval = 300000/100;
             pbBGWork.ProgressValue = 100;
         }
 
@@ -268,7 +183,7 @@ namespace TrackerHelper
         {
             Person user = new Person
             {
-                ApiKey = "d0867cd6f5559eb738c48cd53c870ad9853999e3"//"1287ca3310be20d6992a764b57f9c8bcfbb05664",
+                ApiKey = "d0867cd6f5559eb738c48cd53c870ad9853999e3"
             };
             DBController dbController = new DBController(user);
 
@@ -301,23 +216,64 @@ namespace TrackerHelper
             {
                 pbBGWork.ProgressValue = 100;
                 pbBGWork.ProgressText = "Last update at:" + DateTime.Now.ToString("HH:mm:dd");
-                //  lblPBarSetText("Updated.");
                 timer.Enabled = true;
             }
         }
 
-      /*  private void lblPBarSetText(string message)
+        public void CreateDashboards()
         {
-            if (lblPBar.InvokeRequired)
+            _dashboardList.Add(getDashboardIssues());
+            _dashboardList.Add(getIssuesStatus("Новые", 1));
+            _dashboardList.Add(getIssuesStatus("Назначена", 9));
+            _dashboardList.Add(getIssuesStatus("Нужна информация (сотрудники)", 18));
+            _dashboardList.Add(getIssuesStatus("Эскалирована", 22));
+        }
+
+        public void UpdateDashboards()
+        {
+          //  _dashboardList.Add(getIssuesStatus("Эскалирована", 22));
+        }
+
+        public IDashboardControlsUpdate getIssuesStatus(string Name, int statusId)
+        {
+            DashboardIssuesStatus dash = Controls.Find(Name, true).FirstOrDefault() as DashboardIssuesStatus;
+            if (dash != null)
             {
-                Message lblup = new Message(lblPBarSetText);
-                Invoke(lblup, new object[] { message });
+                return dash;
             }
             else
             {
-                lblPBar.Text = message;
+                DashboardIssuesStatus newDash = new DashboardIssuesStatus
+                {
+                    Parent = this.pnlDashboard,
+                    Dock = DockStyle.Fill,
+                    BackColor = Color.FromArgb(41, 53, 65),
+                    Name = Name,
+                    StatusIdList = new int[] { statusId }
+                };
+                return newDash;
             }
-        }*/
+        }
 
+        public IDashboardControlsUpdate getDashboardIssues()
+        {
+            DashboardIssues dash = Controls.Find("DashboardIssues", true).FirstOrDefault() as DashboardIssues;
+
+            if (dash != null)
+            {
+                return dash;
+            }
+            else
+            {
+                DashboardIssues newDash = new DashboardIssues
+                {
+                    Parent = this.pnlDashboard,
+                    Dock = DockStyle.Fill,
+                    BackColor = Color.FromArgb(41, 53, 65),
+                    Name = "DashboardIssues"
+                };
+                return newDash;
+            }
+        }
     }
 }
