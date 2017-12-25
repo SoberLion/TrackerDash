@@ -15,6 +15,8 @@ namespace TrackerHelper
 {
     public partial class Dashboard : Form
     {
+        delegate void Message(string message);
+
         private List<IDashboardControlsUpdate> _dashboardList = new List<IDashboardControlsUpdate>();
 
         public const int WM_NCLBUTTONDOWN = 0xA1;
@@ -96,17 +98,17 @@ namespace TrackerHelper
         private void btnTechSupp_Click(object sender, EventArgs e)
         {
             Toggle(sender);
-            lblCaption.Text = "Задачи";
+            lblCaption.Text = "Main";
 
             getDashboardIssues().ControlUpdate();
         }
 
-        private void btn1_Click(object sender, EventArgs e)
+        private void btnNew_Click(object sender, EventArgs e)
         {
             lblCaption.Text = "Новые";
             Toggle(sender);
 
-            getIssuesStatus("Новые", 1).ControlUpdate();
+            getIssuesStatus("Новые", 1, 3).ControlUpdate();
         }
 
         private void btnAssigned_Click(object sender, EventArgs e)
@@ -114,7 +116,7 @@ namespace TrackerHelper
             lblCaption.Text = "Назначена";
             Toggle(sender);
 
-            getIssuesStatus("Назначена", 9).ControlUpdate();
+            getIssuesStatus("Назначена", 9, 72).ControlUpdate();
         }
 
         private void btnNeedInfoEmpl_Click(object sender, EventArgs e)
@@ -122,7 +124,7 @@ namespace TrackerHelper
             lblCaption.Text = "Нужна информация (сотрудники)";
             Toggle(sender);
 
-            getIssuesStatus("Нужна информация (сотрудники)", 18).ControlUpdate();
+            getIssuesStatus("Нужна информация (сотрудники)", 18, 8).ControlUpdate();
         }
 
         private void btnEscalated_Click(object sender, EventArgs e)
@@ -130,7 +132,7 @@ namespace TrackerHelper
             lblCaption.Text = "Эскалирована";
             Toggle(sender);
 
-            getIssuesStatus("Эскалирована", 22).ControlUpdate();
+            getIssuesStatus("Эскалирована", 22, 250).ControlUpdate();
          }
 
         private void chbtn_Settings_Click(object sender, EventArgs e)
@@ -151,9 +153,7 @@ namespace TrackerHelper
                     Dock = DockStyle.Fill,
                     BackColor = Color.FromArgb(41, 53, 65),
                     Name = "Настройки",
-                    //StatusIdList = new int[] { 22 }
                 };
-                //newDash.GetDataTable();
                 newDash.BringToFront();
             }
         }
@@ -190,7 +190,7 @@ namespace TrackerHelper
             DBController.onProgressChange += delegate (EventProgressArgs args)
             {
                 bgWorker.ReportProgress(args.Percents);
-                pbBGWork.ProgressText = args.Message;
+                SetLblLastUpdateText(args.Message);
             };
 
             dbController.UpdateIssues(3, 1);
@@ -215,7 +215,7 @@ namespace TrackerHelper
             else
             {
                 pbBGWork.ProgressValue = 100;
-                pbBGWork.ProgressText = "Last update at:" + DateTime.Now.ToString("HH:mm:dd");
+                SetLblLastUpdateText("Last update: " + DateTime.Now.ToString("HH:mm:dd"));
                 timer.Enabled = true;
             }
         }
@@ -223,10 +223,10 @@ namespace TrackerHelper
         public void CreateDashboards()
         {
             _dashboardList.Add(getDashboardIssues());
-            _dashboardList.Add(getIssuesStatus("Новые", 1));
-            _dashboardList.Add(getIssuesStatus("Назначена", 9));
-            _dashboardList.Add(getIssuesStatus("Нужна информация (сотрудники)", 18));
-            _dashboardList.Add(getIssuesStatus("Эскалирована", 22));
+            _dashboardList.Add(getIssuesStatus("Новые", 1, 3));
+            _dashboardList.Add(getIssuesStatus("Назначена", 9, 72));
+            _dashboardList.Add(getIssuesStatus("Нужна информация (сотрудники)", 18, 8));
+            _dashboardList.Add(getIssuesStatus("Эскалирована", 22, 1));
         }
 
         public void UpdateDashboards()
@@ -234,7 +234,7 @@ namespace TrackerHelper
           //  _dashboardList.Add(getIssuesStatus("Эскалирована", 22));
         }
 
-        public IDashboardControlsUpdate getIssuesStatus(string Name, int statusId)
+        public IDashboardControlsUpdate getIssuesStatus(string Name, int statusId, int HoursToOverdue)
         {
             DashboardIssuesStatus dash = Controls.Find(Name, true).FirstOrDefault() as DashboardIssuesStatus;
             if (dash != null)
@@ -249,7 +249,8 @@ namespace TrackerHelper
                     Dock = DockStyle.Fill,
                     BackColor = Color.FromArgb(41, 53, 65),
                     Name = Name,
-                    StatusIdList = new int[] { statusId }
+                    StatusIdList = new int[] { statusId },
+                    HoursToOverdue = HoursToOverdue
                 };
                 return newDash;
             }
@@ -275,5 +276,18 @@ namespace TrackerHelper
                 return newDash;
             }
         }
+        private void SetLblLastUpdateText(string message)
+        {
+            if (lblLastUpdate.InvokeRequired)
+            {
+                Message lblup = new Message(SetLblLastUpdateText);
+                Invoke(lblup, new object[] { message });
+            }
+            else
+            {
+                lblLastUpdate.Text = message;
+            }
+        }
+
     }
 }

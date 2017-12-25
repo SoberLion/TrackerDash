@@ -41,6 +41,7 @@
             this.pnlHorizDivider = new System.Windows.Forms.Panel();
             this.bgWorker = new System.ComponentModel.BackgroundWorker();
             this.timer = new System.Windows.Forms.Timer(this.components);
+            this.lblLastUpdate = new System.Windows.Forms.Label();
             this.pbBGWork = new TrackerHelper.customProgressBar();
             this.chbtn_Settings = new TrackerHelper.CheckedButton();
             this.btnEscalated = new TrackerHelper.CheckedButton();
@@ -81,10 +82,11 @@
             // pnlHeader
             // 
             this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(53)))), ((int)(((byte)(65)))));
-            this.pnlHeader.Controls.Add(this.pbBGWork);
+            this.pnlHeader.Controls.Add(this.lblLastUpdate);
             this.pnlHeader.Controls.Add(this.lblCaption);
             this.pnlHeader.Controls.Add(this.btnHome);
             this.pnlHeader.Controls.Add(this.btnClose);
+            this.pnlHeader.Controls.Add(this.pbBGWork);
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeader.Location = new System.Drawing.Point(4, 0);
             this.pnlHeader.Name = "pnlHeader";
@@ -123,7 +125,7 @@
             this.btnClose.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(88)))), ((int)(((byte)(86)))));
             this.btnClose.Location = new System.Drawing.Point(943, 0);
             this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(87, 50);
+            this.btnClose.Size = new System.Drawing.Size(87, 49);
             this.btnClose.TabIndex = 1;
             this.btnClose.Text = "CLOSE";
             this.btnClose.UseVisualStyleBackColor = false;
@@ -181,18 +183,29 @@
             this.timer.Interval = 300000;
             this.timer.Tick += new System.EventHandler(this.timer_Tick);
             // 
+            // lblLastUpdate
+            // 
+            this.lblLastUpdate.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.lblLastUpdate.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.lblLastUpdate.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(88)))), ((int)(((byte)(86)))));
+            this.lblLastUpdate.Location = new System.Drawing.Point(537, 12);
+            this.lblLastUpdate.Name = "lblLastUpdate";
+            this.lblLastUpdate.Size = new System.Drawing.Size(400, 24);
+            this.lblLastUpdate.TabIndex = 4;
+            this.lblLastUpdate.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // pbBGWork
             // 
-            this.pbBGWork.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.pbBGWork.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pbBGWork.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.pbBGWork.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(88)))), ((int)(((byte)(86)))));
-            this.pbBGWork.Location = new System.Drawing.Point(638, 14);
+            this.pbBGWork.Location = new System.Drawing.Point(0, 49);
             this.pbBGWork.Margin = new System.Windows.Forms.Padding(11, 9, 11, 9);
             this.pbBGWork.Name = "pbBGWork";
-            this.pbBGWork.ProgressColor = System.Drawing.Color.FromArgb(((int)(((byte)(21)))), ((int)(((byte)(33)))), ((int)(((byte)(45)))));
+            this.pbBGWork.ProgressColor = System.Drawing.Color.Gainsboro;
             this.pbBGWork.ProgressText = "";
             this.pbBGWork.ProgressValue = 0;
-            this.pbBGWork.Size = new System.Drawing.Size(304, 21);
+            this.pbBGWork.Size = new System.Drawing.Size(1030, 1);
             this.pbBGWork.TabIndex = 3;
             // 
             // chbtn_Settings
@@ -289,7 +302,7 @@
             this.btnNew.Text = "         Новая";
             this.btnNew.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnNew.UseVisualStyleBackColor = false;
-            this.btnNew.Click += new System.EventHandler(this.btn1_Click);
+            this.btnNew.Click += new System.EventHandler(this.btnNew_Click);
             // 
             // btnTechSupp
             // 
@@ -306,7 +319,7 @@
             this.btnTechSupp.Name = "btnTechSupp";
             this.btnTechSupp.Size = new System.Drawing.Size(200, 46);
             this.btnTechSupp.TabIndex = 0;
-            this.btnTechSupp.Text = "      Задачи";
+            this.btnTechSupp.Text = "      Main";
             this.btnTechSupp.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnTechSupp.UseVisualStyleBackColor = false;
             this.btnTechSupp.Click += new System.EventHandler(this.btnTechSupp_Click);
@@ -354,5 +367,6 @@
         private customProgressBar pbBGWork;
         private System.ComponentModel.BackgroundWorker bgWorker;
         private System.Windows.Forms.Timer timer;
+        private System.Windows.Forms.Label lblLastUpdate;
     }
 }

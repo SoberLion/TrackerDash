@@ -29,21 +29,11 @@
         private void InitializeComponent()
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.pnlLayoutBot = new System.Windows.Forms.Panel();
             this.pnlLayoutMain = new System.Windows.Forms.Panel();
             this.dgvIssuesStatus = new System.Windows.Forms.DataGridView();
             this.pnlLayoutMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvIssuesStatus)).BeginInit();
             this.SuspendLayout();
-            // 
-            // pnlLayoutBot
-            // 
-            this.pnlLayoutBot.BackColor = System.Drawing.Color.Transparent;
-            this.pnlLayoutBot.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pnlLayoutBot.Location = new System.Drawing.Point(0, 630);
-            this.pnlLayoutBot.Name = "pnlLayoutBot";
-            this.pnlLayoutBot.Size = new System.Drawing.Size(1200, 170);
-            this.pnlLayoutBot.TabIndex = 0;
             // 
             // pnlLayoutMain
             // 
@@ -52,7 +42,7 @@
             this.pnlLayoutMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlLayoutMain.Location = new System.Drawing.Point(0, 0);
             this.pnlLayoutMain.Name = "pnlLayoutMain";
-            this.pnlLayoutMain.Size = new System.Drawing.Size(1200, 630);
+            this.pnlLayoutMain.Size = new System.Drawing.Size(1200, 800);
             this.pnlLayoutMain.TabIndex = 1;
             // 
             // dgvIssuesStatus
@@ -73,7 +63,7 @@
             this.dgvIssuesStatus.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             this.dgvIssuesStatus.RowHeadersVisible = false;
             this.dgvIssuesStatus.RowTemplate.ReadOnly = true;
-            this.dgvIssuesStatus.Size = new System.Drawing.Size(1200, 630);
+            this.dgvIssuesStatus.Size = new System.Drawing.Size(1200, 800);
             this.dgvIssuesStatus.TabIndex = 0;
             // 
             // DashboardIssuesStatus
@@ -82,7 +72,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.WindowFrame;
             this.Controls.Add(this.pnlLayoutMain);
-            this.Controls.Add(this.pnlLayoutBot);
             this.Name = "DashboardIssuesStatus";
             this.Size = new System.Drawing.Size(1200, 800);
             this.pnlLayoutMain.ResumeLayout(false);
@@ -92,8 +81,6 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.Panel pnlLayoutBot;
         private System.Windows.Forms.Panel pnlLayoutMain;
         private System.Windows.Forms.DataGridView dgvIssuesStatus;
     }

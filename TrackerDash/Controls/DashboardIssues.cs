@@ -14,13 +14,9 @@ namespace TrackerHelper.Controls
 {
     public partial class DashboardIssues : UserControl, IDashboardControlsUpdate
     {
-        /*static string cartesianAssigned = @"";
-        static string cartesianNew = @"";
-        static string cartesianStacked = @"";*/
-
 
         static string _dateFormat = "yyyy-MM-dd HH:mm:ss:fff";
-        private string _userIdList = "2361,2374,1830,2233,1240,1383,2886,2235,1521,2232,1537,2535,551,894,3713,328,751,2270";
+        private string _userIdList = "2361,2374,1830,2233,1240,1383,2886,2235,1521,2232,2535,551,894,3713,328,751,2270";
         private string _statusIdList = "3,5,6,19,26,27,29,30";
 
         public string UserIdList
@@ -39,10 +35,8 @@ namespace TrackerHelper.Controls
         {
             InitializeComponent();
             cartesianChart.DataTooltip.Background = Brushes.Gainsboro;
-            pieChartProjects.DataTooltip.Background = Brushes.Gainsboro;
-            pieChartStatus.DataTooltip.Background = Brushes.Gainsboro;
-            pieChartCategory.DataTooltip.Background = Brushes.Gainsboro;
-
+            cartesianChart.DataTooltip.IsEnabled = false;
+            cartesianChart.DataTooltip.Visibility = System.Windows.Visibility.Hidden;
         }
 
         private void TSDashboard_Load(object sender, EventArgs e)
@@ -60,9 +54,6 @@ namespace TrackerHelper.Controls
 
         public void UpdateTSDashboard()
         {
-            UpdatePieChartProjects(UserIdList);
-            UpdatePieChartStatus(UserIdList);
-            UpdatePieChartCategory(UserIdList);
             CartesianChartStackedColumns(UserIdList);
 
             FilterBtnClick(btnWeek, EventArgs.Empty);
@@ -73,261 +64,182 @@ namespace TrackerHelper.Controls
             UpdateLblStatusValue(lblStatusEscalatedValue, "22", UserIdList);
 
 
-            CheckStatusOverdue(lblStatusNewOverduedValue,pnlStatusNew, 10, 18, 5, "1", UserIdList);
-            CheckStatusOverdue(lblStatusAssignedOverduedValue, pnlStatusAssigned, 10, 18, 72, "9", UserIdList);
-            CheckStatusOverdue(lblStatusNeedInfoEmplOverduedValue, pnlStatusNeedInfoEmpl, 10, 18, 8, "18", UserIdList);
-            CheckStatusOverdue(lblStatusEscalatedOverduedValue, pnlStatusEscalated, 10, 18, 1, "22", UserIdList);
-
             CreateUsersButtons();
             tmrSplash.Enabled = true;
         }
 
         private void CreateUsersButtons()
         {
-            if (pnlTopRight.Controls.Count > 0)
-                return;
+            pnlTopMid.Controls.Clear();
+            pnlTopRight.Controls.Clear();
+            
+            string todayTimeQuery = $@"SELECT UserName, ROUND(sum(hours),2) AS Hours FROM TimeEntries WHERE userid IN ({UserIdList}) 
+                                    AND spenton LIKE '{DateTime.Now.ToString("yyyy-MM-dd")}%' 
+                                    GROUP BY UserName
+                                    ORDER BY UserName";
 
-            string todayTimeQuery = $@"SELECT UserId, ROUND(sum(hours),2) AS Hours FROM TimeEntries WHERE userid IN ({UserIdList}) 
-                                    AND spenton LIKE '{DateTime.Now.ToString("yyyy-MM-dd")}%' GROUP BY userid";
+            string WeekTimeQuery = $@"SELECT UserName, ROUND(sum(hours),2) AS Hours FROM TimeEntries WHERE userid IN ({UserIdList}) 
+                                    AND spenton > '{getFirstDayofWeekDate(DateTime.Now).AddDays(-1).ToString("yyyy-MM-dd 23:59:59:000")}' 
+                                    AND spenton < '{DateTime.Now.ToString("yyyy-MM-dd 23:59:59:000")}'
+                                    GROUP BY userid
+                                    ORDER BY UserName";
 
-            DataTable TimeTable = DBman.OpenQuery(todayTimeQuery);
+            string MonthTimeQuery = $@"SELECT UserName, ROUND(sum(hours),2) AS Hours FROM TimeEntries WHERE userid IN ({UserIdList}) 
+                                    AND spenton > '{DateTime.Now.ToString("yyyy-MM-01 00:00:00:001")}' 
+                                    AND spenton < '{DateTime.Now.ToString("yyyy-MM-dd 23:59:59:000")}'
+                                    GROUP BY UserName
+                                    ORDER BY UserName";
 
-            string query = $"SELECT DISTINCT AssignedToName, AssignedToId FROM Issues WHERE AssignedToId IN ({UserIdList}) ORDER BY AssignedToName desc";
+            DataRow[] todayTimeRows = DBman.OpenQuery(todayTimeQuery).Select("");
+            DataRow[] weekTimeRows = DBman.OpenQuery(WeekTimeQuery).Select("");
+            DataRow[] monthTimeRows = DBman.OpenQuery(MonthTimeQuery).Select("");
 
-            DataTable dt = DBman.OpenQuery(query);
-            DataRow[] dr = dt.Select("");
-            for(int i = 0; i < dr.Length; i++)
+            string query = $"SELECT DISTINCT Lastname, Firstname FROM Users WHERE Id IN ({UserIdList}) ORDER BY Lastname desc";
+
+            DataRow[] NameList = DBman.OpenQuery(query).Select("");
+            for (int i = 0; i < NameList.Length; i++)
             {
-                string s = TimeTable.Select($"UserId={dr[i][1].ToString()}").Length > 0 ? TimeTable.Select($"UserId={dr[i][1].ToString()}")[0][1].ToString() : "0,00";
-                CheckedButton btn = new CheckedButton
-                {                    
-                    Name = "btn" + dr[i][0].ToString(),
+                Label lblName = new Label
+                {
                     Parent = pnlTopRight,
-                    Text = dr[i][0].ToString() + $" ({s})",
-                    Tag = dr[i][1],
-                    Dock = DockStyle.Top,
-                    Height = 30,
-                    ForeColor = System.Drawing.Color.FromArgb(86, 88, 86),
-                    FlatStyle = FlatStyle.Flat,
+                    Text = NameList[i][0].ToString() + " " + NameList[i][1].ToString(),
+                    TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
                     Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold),
-                    TextAlign = System.Drawing.ContentAlignment.MiddleRight
+                    ForeColor = System.Drawing.Color.Gainsboro,
+                    AutoSize = false,
+                    Dock = DockStyle.Top,
+                    Height = 30
+                };
+                Panel pnlHours = new Panel
+                {
+                    Parent = pnlTopMid,
+                    Dock = DockStyle.Top,
+                    Height = 30
+                };
+                Label lblmonth = new Label
+                {
+                    Parent = pnlHours,
+                    Text = "0.00",
+                    TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
+                    Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold),
+                    ForeColor = System.Drawing.Color.Gainsboro,
+                    AutoSize = false,
+                    Width = 70,
+                    Dock = DockStyle.Right
+                };
+                Label lblWeek = new Label
+                {
+                    Parent = pnlHours,
+                    Text = "0.00",
+                    TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
+                    Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold),
+                    ForeColor = System.Drawing.Color.Gainsboro,
+                    AutoSize = false,
+                    Width = 70,
+                    Dock = DockStyle.Right
+                };
+                Label lblToday = new Label
+                {
+                    Parent = pnlHours,
+                    Text = "0.00",
+                    TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
+                    Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold),
+                    ForeColor = System.Drawing.Color.Gainsboro,
+                    AutoSize = false,
+                    Width = 70,
+                    Dock = DockStyle.Right
                 };
 
-                btn.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(65, 184, 92);
-                btn.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(21, 33, 45);
-                btn.FlatAppearance.BorderSize = 0;
-                btn.Click += btnUsers_Click;
-                btn.CheckedChange += btnUsersCheckedChange;
+                for (int j = 0; j < todayTimeRows.Length; j++)
+                {
+                    if (todayTimeRows[j][0].ToString().Contains(NameList[i][0].ToString()))
+                    {
+                        lblToday.Text = todayTimeRows[j][1].ToString();
+                    }
+                }
+                for (int j = 0; j < weekTimeRows.Length; j++)
+                {
+                    if (weekTimeRows[j][0].ToString().Contains(NameList[i][0].ToString()))
+                    {
+                        lblWeek.Text = weekTimeRows[j][1].ToString();
+                    }
+                }
+                for (int j = 0; j < monthTimeRows.Length; j++)
+                {
+                    if (monthTimeRows[j][0].ToString().Contains(NameList[i][0].ToString()))
+                    {
+                        lblmonth.Text = monthTimeRows[j][1].ToString();
+                    }
+                }
             }
-            CheckedButton AllUsers = new CheckedButton
+            Label lblNameHeader = new Label
             {
-                Name = "btnAllUsers",
                 Parent = pnlTopRight,
-                Text = "Все",
-                Tag = UserIdList,
-                Dock = DockStyle.Top,
-                Height = 30,
-                ForeColor = System.Drawing.Color.FromArgb(86, 88, 86),
-                FlatStyle = FlatStyle.Flat,
+                Text = "ФИО",
+                TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
                 Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold),
-                TextAlign = System.Drawing.ContentAlignment.MiddleRight
+                ForeColor = System.Drawing.Color.Gainsboro,
+                AutoSize = false,
+                Dock = DockStyle.Top,
+                Height = 30
             };
-            AllUsers.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(65, 184, 92);
-            AllUsers.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(21,33,45);
-            AllUsers.FlatAppearance.BorderSize = 0;
-            AllUsers.Click += btnUsers_Click;
-            AllUsers.CheckedChange += btnUsersCheckedChange;
-        }
-
-        private void btnUsers_Click(object sender, EventArgs e)
-        {
-            if (sender is CheckedButton cb)
+            Panel pnlHoursHeader = new Panel
             {
-                BtnUsersToggle(sender);
-                string id = cb.Tag.ToString();
-
-                UpdatePieChartProjects(id);
-                UpdatePieChartStatus(id);
-                UpdateLblStatusValue(lblStatusNewValue, "1", id);
-                UpdateLblStatusValue(lblStatusAssignedValue, "9", id);
-                UpdateLblStatusValue(lblStatusNeedInfoEmplValue, "18", id);
-                UpdateLblStatusValue(lblStatusEscalatedValue, "22", id);
-
-                CheckStatusOverdue(lblStatusNewOverduedValue, pnlStatusNew, 10, 18, 5, "1", id);
-                CheckStatusOverdue(lblStatusAssignedOverduedValue, pnlStatusAssigned, 10, 18, 72, "9", id);
-                CheckStatusOverdue(lblStatusNeedInfoEmplOverduedValue, pnlStatusNeedInfoEmpl, 10, 18, 8, "18", id);
-                CheckStatusOverdue(lblStatusEscalatedOverduedValue, pnlStatusEscalated, 10, 18, 1, "22", id);
-
-                string query = $@"SELECT count (*) as StatusCount, StatusName FROM Issues WHERE AssignedToId IN ({id}) 
-                            AND statusId NOT IN ({StatusIdList}) GROUP BY StatusName ORDER BY StatusCount DESC";
-                CartesianChartColumns(query);
-            }            
-        }
-
-        private void UpdatePieChartProjects(string userIdList)
-        {
-            Func<ChartPoint, string> labelPoint = chartPoint => string.Format("{0} ({1:P})", chartPoint.Y, chartPoint.Participation);
-            string query = $@"SELECT count (*) AS IssuesCount, projectName FROM Issues WHERE AssignedToId IN ({userIdList}) 
-                            AND statusId NOT IN ({StatusIdList}) GROUP BY ProjectName ORDER BY IssuesCount DESC";
-            DataTable dt = DBman.OpenQuery(query);
-            DataRow[] dr = dt.Select("");
-            SeriesCollection col = new SeriesCollection();
-            List<string> ls = dr.Select(p => p[0].ToString()).ToList();
-
-            int sum = ls.Sum(p => Convert.ToInt32(p));
-            int otherIssuesSum = 0;
-            int otherCounter = 0;
-            for (int i = 0; i < dr.Length; i++)
-            {
-                if (Convert.ToInt32(dr[i][0]) < (sum / 100))
-                {
-                    otherIssuesSum += Convert.ToInt32(dr[i][0]);
-                    otherCounter++;
-                    continue;
-                }
-                PieSeries columnSeries = new PieSeries
-                {
-                    Title = dr[i][1].ToString(),
-                    Values = new ChartValues<int> { Convert.ToInt32(dr[i][0]) },
-                    LabelPoint = point => point.Y.ToString(),
-                    DataLabels = true,
-                };
-                col.Add(columnSeries);
-            }
-            PieSeries otherSeries = new PieSeries
-            {
-                Title = "Другие проекты < 1%: " + otherCounter.ToString(),
-                Values = new ChartValues<int> { otherIssuesSum },
-                LabelPoint = point => point.Y.ToString(),
-                DataLabels = true,
+                Parent = pnlTopMid,
+                Dock = DockStyle.Top,
+                Height = 30
             };
-            col.Add(otherSeries);
-
-            pieChartProjects.Series = col;
-        }
-
-        private void PieChartOtherProjects(string userIdList)
-        {
-            string query = $@"SELECT * 
-                            FROM (SELECT count (*) AS IssuesCount, projectName
-                                FROM Issues
-                                WHERE AssignedToId IN ({userIdList}) AND statusId NOT IN ({_statusIdList})
-                                GROUP BY issues.ProjectName) GroupedIssues
-                            WHERE GroupedIssues.IssuesCount < 
-                                (SELECT Count(*) FROM Issues WHERE AssignedToId IN ({userIdList}) AND statusId NOT IN ({StatusIdList})) / 100 
-                            ORDER BY IssuesCount DESC";
-
-            DataTable dt = DBman.OpenQuery(query);
-
-            SeriesCollection col = new SeriesCollection();
-
-            for (int i = 0; i < dt.Rows.Count; i++)
+            Label lblmonthHeader = new Label
             {
-                PieSeries columnSeries = new PieSeries
-                {
-                    Title = dt.Rows[i][1].ToString(),
-                    Values = new ChartValues<int> { Convert.ToInt32(dt.Rows[i][0]) },
-                    LabelPoint = point => point.Y.ToString(),
-                    DataLabels = true,
-                };
-                col.Add(columnSeries);
-            }
-
-            pieChartProjects.Series = col;
-        }
-
-        private void UpdatePieChartStatus(string userIdList)
-        {
-            Func<ChartPoint, string> labelPoint = chartPoint => string.Format("{0} ({1:P})", chartPoint.Y, chartPoint.Participation);
-
-            DataTable dt = DBman.OpenQuery($@"SELECT count (*) as IssuesCount, StatusName FROM issues WHERE AssignedToId in 
-                                           ({userIdList}) AND statusId NOT IN ({StatusIdList}) GROUP BY StatusName ORDER BY IssuesCount desc");
-            DataRow[] dr = dt.Select("");
-            SeriesCollection col = new SeriesCollection();
-            List<string> ls = dr.Select(p => p[0].ToString()).ToList();
-
-            int sum = ls.Sum(p => Convert.ToInt32(p));
-            int otherIssuesSum = 0;
-            int otherCounter = 0;
-            for (int i = 0; i < dr.Length; i++)
-            {
-                if (Convert.ToInt32(dr[i][0]) < (sum / 100))
-                {
-                    otherIssuesSum += Convert.ToInt32(dr[i][0]);
-                    otherCounter++;
-                    continue;
-                }
-                PieSeries columnSeries = new PieSeries
-                {
-                    Title = dr[i][1].ToString(),
-                    Values = new ChartValues<int> { Convert.ToInt32(dr[i][0]) },
-                    LabelPoint = point => point.Y.ToString(),
-                    DataLabels = true,
-                };
-                col.Add(columnSeries);
-            }
-
-            PieSeries otherSeries = new PieSeries
-            {
-                Title = "Другие статусы < 1%: " + otherCounter.ToString(),
-                Values = new ChartValues<int> { otherIssuesSum },
-                LabelPoint = point => point.Y.ToString(),
-                DataLabels = true,
+                Parent = pnlHoursHeader,
+                Text = "Месяц",
+                TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
+                Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold),
+                ForeColor = System.Drawing.Color.Gainsboro,
+                AutoSize = false,
+                Width = 70,
+                Dock = DockStyle.Right
             };
-            col.Add(otherSeries);
-
-            pieChartStatus.Series = col;
+            Label lblWeekHeader = new Label
+            {
+                Parent = pnlHoursHeader,
+                Text = "Неделя",
+                TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
+                Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold),
+                ForeColor = System.Drawing.Color.Gainsboro,
+                AutoSize = false,
+                Width = 70,
+                Dock = DockStyle.Right
+            };
+            Label lblTodayHeader = new Label
+            {
+                Parent = pnlHoursHeader,
+                Text = "День",
+                TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
+                Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold),
+                ForeColor = System.Drawing.Color.Gainsboro,
+                AutoSize = false,
+                Width = 70,
+                Dock = DockStyle.Right
+            };
         }
 
-        private void UpdatePieChartCategory(string userIdList)
+        public DateTime getFirstDayofWeekDate(DateTime Date)
         {
-            Func<ChartPoint, string> labelPoint = chartPoint => string.Format("{0} ({1:P})", chartPoint.Y, chartPoint.Participation);
-
-            DataTable dt = DBman.OpenQuery($@"SELECT count (*) as IssuesCount, CategoryName FROM issues WHERE AssignedToId in 
-                                           ({userIdList}) AND statusId NOT IN ({StatusIdList}) GROUP BY CategoryName ORDER BY IssuesCount desc");
-            DataRow[] dr = dt.Select("");
-            SeriesCollection col = new SeriesCollection();
-            List<string> ls = dr.Select(p => p[0].ToString()).ToList();
-
-            int sum = ls.Sum(p => Convert.ToInt32(p));
-            int otherIssuesSum = 0;
-            int otherCounter = 0;
-            for (int i = 0; i < dr.Length; i++)
-            {
-                if (Convert.ToInt32(dr[i][0]) < (sum / 100))
-                {
-                    otherIssuesSum += Convert.ToInt32(dr[i][0]);
-                    otherCounter++;
-                    continue;
-                }
-                PieSeries columnSeries = new PieSeries
-                {
-                    Title = dr[i][1].ToString(),
-                    Values = new ChartValues<int> { Convert.ToInt32(dr[i][0]) },
-                    LabelPoint = point => point.Y.ToString(),
-                    DataLabels = true,
-                };
-                col.Add(columnSeries);
-            }
-
-            PieSeries otherSeries = new PieSeries
-            {
-                Title = "Другие категории < 1%: " + otherCounter.ToString(),
-                Values = new ChartValues<int> { otherIssuesSum },
-                LabelPoint = point => point.Y.ToString(),
-                DataLabels = true,
-            };
-            col.Add(otherSeries);
-
-            pieChartCategory.Series = col;
+            while (Date.DayOfWeek != DayOfWeek.Monday)
+                Date = Date.AddDays(-1);
+            return Date;
         }
 
         private void CartesianChartStackedColumns(string userIdList)
         {
-            string query = $@"select count (*) as IssuesCount, StatusName, AssignedToName from issues where AssignedToId in ({userIdList}) and 
-                            statusId not in ({StatusIdList}) group by StatusName, AssignedToName order by AssignedToName, StatusName";
-            DataTable dt = DBman.OpenQuery(query);
-            DataRow[] dr = dt.Select("");
+            string query = $@"SELECT COUNT(*) AS IssuesCount, StatusName, AssignedToName 
+                            FROM issues WHERE AssignedToId IN ({userIdList}) 
+                            AND statusId NOT IN ({StatusIdList}) 
+                            GROUP BY StatusName, AssignedToName 
+                            ORDER BY AssignedToName, StatusName";
+
+            DataRow[] dr = DBman.OpenQuery(query).Select("");
 
             SeriesCollection col = new SeriesCollection();
 
@@ -355,7 +267,7 @@ namespace TrackerHelper.Controls
                     if (col[i].Title == dr[rowiterator][1].ToString())
                     {
                         col[i].Values.Add(Convert.ToInt32(dr[rowiterator][0]));
-                        if (rowiterator < dr.Length -1)
+                        if (rowiterator < dr.Length - 1)
                         {
                             rowiterator++;
                         }
@@ -376,7 +288,8 @@ namespace TrackerHelper.Controls
                 Separator = new Separator { Step = 1, IsEnabled = false },
                 Labels = AssignedToNameList,
                 LabelsRotation = 70,
-                Foreground = Brushes.Gainsboro
+                Foreground = Brushes.Gainsboro,
+                FontSize = 20
             };
 
             cartesianChart.AxisX.Clear();
@@ -384,88 +297,14 @@ namespace TrackerHelper.Controls
 
             cartesianChart.Series = col;
             cartesianChart.AxisX.Add(ax);
-        }
 
-        private void CartesianChartColumns(string query)
-        {
-           // string query = $@"SELECT count (*) as StatusCount, StatusName FROM Issues WHERE AssignedToId IN ({userIdList}) 
-            //                AND statusId NOT IN ({StatusIdList}) GROUP BY StatusName ORDER BY StatusCount DESC";
-            DataTable dt = DBman.OpenQuery(query);
-            DataRow[] dr = dt.Select("");
-
-            SeriesCollection col = new SeriesCollection();            
-
-            Axis ay = new Axis { LabelFormatter = value => value.ToString(), Separator = new Separator(), MinValue = 0 };
-
-            for (int i = 0; i < dt.Rows.Count; i++)
+            DefaultLegend dl = new DefaultLegend
             {
-                ColumnSeries columnSeries = new ColumnSeries
-                {
-                    Title = dt.Rows[i][1].ToString(),
-                    Values = new ChartValues<int> { Convert.ToInt32(dt.Rows[i][0]) },
-                    LabelPoint = point => point.Y.ToString(),
-                    DataLabels = true,
-                    Foreground = Brushes.Gainsboro
-                };
-                col.Add(columnSeries);
-            }
-
-            cartesianChart.AxisX.Clear();
-            cartesianChart.AxisY.Clear();
-
-            cartesianChart.Series = col;
-            cartesianChart.AxisY.Add(ay);
-
-
-         //   cartesianChart.DataTooltip. .SelectionMode = LiveCharts.TooltipSelectionMode.OnlySender;
-
-        }
-
-        /// <param name="label">Ссылка на Label</param>
-        /// <param name="panel">Ссылка на Panel у которой будет заполняться Tag</param>
-        /// <param name="hoursFrom">Время начала рабочего дня</param>
-        /// <param name="hoursTo">Время конца рабочего дня</param>
-        /// <param name="hoursToOverdue">Часы до превышения лимита</param>
-        /// <param name="statusId">Id статуса</param>
-        public void CheckStatusOverdue(Label label, Panel panel, int hoursFrom, int hoursTo, int hoursToOverdue, string statusId, string UserId)
-        {
-            string overdue;            
-
-            overdue = DateTime.Now.AddHours(-GetHours(hoursFrom, hoursTo, hoursToOverdue)).ToString(_dateFormat);
-
-            string query = $@"SELECT count(*) from issues WHERE statusid = {statusId} AND createdOn < '{overdue}' 
-                            AND AssignedToId in ({UserId}) and projectId in (26, 220)";
-
-            DataTable dt = DBman.OpenQuery(query);
-
-            (label as Label).Text = dt.Rows[0][0].ToString() != "0" ? dt.Rows[0][0].ToString() : string.Empty;
-
-            (panel as Panel).Tag = overdue + ";" + statusId + ";" + UserId;
-        }
-
-        public int GetHours(int hoursFrom, int hoursTo, int hoursToOverdue)
-        {
-            int hours = hoursToOverdue;
-            if (DateTime.Now.DayOfWeek == DayOfWeek.Monday && (DateTime.Now.Hour - hours) < hoursFrom)
-            {
-                hours = 24 * 3 - hoursTo + hoursFrom + hours;
-            }
-            if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday)
-            {
-                hours = 24 * 2 - hoursTo + hoursFrom + hours;
-            }
-            if (DateTime.Now.DayOfWeek == DayOfWeek.Saturday)
-            {
-                hours = 24 - hoursTo + hoursFrom + hours;
-            }
-            if ((DateTime.Now.DayOfWeek == DayOfWeek.Tuesday ||
-               DateTime.Now.DayOfWeek == DayOfWeek.Wednesday ||
-               DateTime.Now.DayOfWeek == DayOfWeek.Thursday ||
-               DateTime.Now.DayOfWeek == DayOfWeek.Friday) && ((DateTime.Now.Hour - hours) < hoursFrom))
-            {
-                hours = 24 - hoursTo + hoursFrom + hours;
-            }
-            return hours;
+                Foreground = Brushes.Gainsboro,
+                FontSize = 15
+            };
+            cartesianChart.DefaultLegend = dl;
+            cartesianChart.LegendLocation = LegendLocation.Right;
         }
 
         public void UpdateLblStatusValue(object obj, string statusId, string userIdList)
@@ -549,43 +388,6 @@ namespace TrackerHelper.Controls
 
         #endregion 
 
-        private void pieChartProjects_DataClick(object sender, ChartPoint chartPoint)
-        {
-            PieChartOtherProjects(UserIdList);
-          //  string query = $@"SELECT count (*) as ProjectCount, ProjectName FROM Issues WHERE AssignedToId IN ({UserIdList}) 
-                          //  AND statusId NOT IN ({StatusIdList}) GROUP BY ProjectName ORDER BY ProjectCount";
-           // CartesianChartColumns(query);
-            /*
-            var chart = (LiveCharts.Wpf.PieChart)chartPoint.ChartView;
-            var selectedSeries = (PieSeries)chartPoint.SeriesView;  
-            var chart = (LiveCharts.WinForms.PieChart)chartPoint.ChartView;
-
-            //clear selected slice.
-            foreach (PieSeries series in chart.Series)
-                series.PushOut = 0;
-
-            var selectedSeries = (PieSeries)chartPoint.SeriesView;
-            selectedSeries.PushOut = 8;*/
-        }
-
-        private void BtnUsersToggle(object sender)
-        {
-            foreach (var item in pnlTopRight.Controls)
-            {
-                if (item is CheckedButton cb)
-                {
-                    cb.Check = false;
-                }
-            }
-
-            (sender as CheckedButton).Check = true;
-        }
-
-        private void btnUsersCheckedChange(object sender, EventArgs e)
-        {
-            if(sender is CheckedButton cb)
-                cb.BackColor = cb.Check == false ? System.Drawing.Color.FromArgb(21, 33, 45) : System.Drawing.Color.FromArgb(41, 53, 65);
-        }
 
         private void BtnFiltersToggle(object sender)
         {
@@ -596,46 +398,6 @@ namespace TrackerHelper.Controls
 
             (sender as CheckedButton).Check = true;
             (sender as CheckedButton).BackColor = System.Drawing.Color.FromArgb(21, 33, 45);
-        }
-
-        private void pnlStatusNew_Click(object sender, EventArgs e)
-        {
-            StatusPanelClick(sender);
-        }
-
-        private void StatusPanelClick(object sender)
-        {           
-            string[] overdue = (sender as Panel).Tag?.ToString().Split(';');
-            if (overdue == null || overdue.Length < 2)
-                return;
-
-            string query = $@"SELECT IssueId, AssignedToName from issues WHERE statusid = {overdue[1]} AND createdOn < '{overdue[0]}' 
-                            AND AssignedToId in ({overdue[2]}) and projectId in (26, 220)";
-
-            DataTable dt = DBman.OpenQuery(query);
-            DataRow[] dr = dt.Select("");
-            StringBuilder sb = new StringBuilder();
-            foreach (var item in dr)
-            {
-                sb.AppendLine($"{item[0].ToString()}: {item[1].ToString()}");
-            }
-            if(sb.Length > 0)
-                MessageBox.Show(sb.ToString());
-        }
-
-        private void pnlStatusAssigned_Click(object sender, EventArgs e)
-        {
-            StatusPanelClick(sender);
-        }
-
-        private void pnlStatusNeedInfoEmpl_Click(object sender, EventArgs e)
-        {
-            StatusPanelClick(sender);
-        }
-
-        private void pnlStatusEscalated_Click(object sender, EventArgs e)
-        {
-            StatusPanelClick(sender);
         }
 
         private void tmrSplash_Tick(object sender, EventArgs e)

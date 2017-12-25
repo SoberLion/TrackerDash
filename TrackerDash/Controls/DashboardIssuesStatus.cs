@@ -18,6 +18,7 @@ namespace TrackerHelper.Controls
         private int[] _statusIdList = new int[] { 1 };
         private DataTable _issuesTable = new DataTable();
         private int[] _projectId = new int[]{ 26, 220 };
+        private int _hoursToOverdue = 0;
 
 
         public int[] UserIdList
@@ -44,6 +45,12 @@ namespace TrackerHelper.Controls
             set { _projectId = value; }
         }
 
+        public int HoursToOverdue
+        {
+            get { return _hoursToOverdue; }
+            set { _hoursToOverdue = value; }
+        }
+
         public DashboardIssuesStatus()
         {
             InitializeComponent();            
@@ -62,13 +69,14 @@ namespace TrackerHelper.Controls
 
         public void GetDataTable()
         {
-            string query = $@"SELECT IssueId as 'Номер задачи', strftime('%Y-%m-%d %H:%M',CreatedOn) as 'Создан', AssignedToName as 'Назначена',
-                            Subject as 'Тема' FROM ISSUES 
-                            WHERE StatusId IN ({ArrayToString(StatusIdList)}) AND AssignedToId in ({ArrayToString(UserIdList)}) AND ProjectId in ({ArrayToString(ProjectId)}) ORDER BY AssignedToName";
-            IssuesTable = DBman.OpenQuery(query);
+            //  string query = $@"SELECT IssueId as 'Номер задачи', strftime('%Y-%m-%d %H:%M',CreatedOn) as 'Создан', AssignedToName as 'Назначена',
+            //       Subject as 'Тема' FROM ISSUES 
+            //            WHERE StatusId IN ({ArrayToString(StatusIdList)}) AND AssignedToId in ({ArrayToString(UserIdList)}) AND ProjectId in ({ArrayToString(ProjectId)}) ORDER BY AssignedToName";
+            //    IssuesTable = DBman.OpenQuery(query);
 
-            dgvIssuesStatus.DataSource = IssuesTable;
+            dgvIssuesStatus.DataSource = CheckStatusOverdue(10, 20, HoursToOverdue);
 
+            dgvIssuesStatus.ClearSelection();
             dgvIssuesStatus.BackgroundColor = Color.FromArgb(43, 51, 65);
 
             dgvIssuesStatus.AllowUserToOrderColumns = true;
@@ -104,6 +112,76 @@ namespace TrackerHelper.Controls
                 dgvIssuesStatus.Columns["Назначена"].DefaultCellStyle.Font = font;
                 dgvIssuesStatus.ColumnHeadersDefaultCellStyle.Font = font;
             }
+        }
+
+        /// <param name="label">Ссылка на Label</param>
+        /// <param name="panel">Ссылка на Panel у которой будет заполняться Tag</param>
+        /// <param name="hoursFrom">Время начала рабочего дня</param>
+        /// <param name="hoursTo">Время конца рабочего дня</param>
+        /// <param name="hoursToOverdue">Часы до превышения лимита</param>
+        /// <param name="statusId">Id статуса</param>
+        public DataTable CheckStatusOverdue(int hoursFrom, int hoursTo, int hoursToOverdue)
+        {
+            string overdue;
+
+            overdue = DateTime.Now.AddHours(-GetHours(hoursFrom, hoursTo, hoursToOverdue)).ToString(_dateFormat);
+
+            string query = $@"SELECT issueid AS 'Номер задачи'
+                            , strftime('%Y-%m-%d %H:%M',CreatedOn) AS 'Создан'
+                            , AssignedToName AS 'Назначена'
+                            , Subject AS 'Тема'
+                            FROM Issues 
+                            WHERE issueId IN
+	                            (SELECT IssueId FROM Journals WHERE CreatedOn < '{overdue}' AND id IN
+		                            (SELECT JournalId FROM JournalDetails WHERE newValue IN ({ArrayToString(StatusIdList)})))
+                            AND StatusId IN ({ArrayToString(StatusIdList)})
+                            AND AssignedToId IN ({ArrayToString(UserIdList)})
+                            AND ProjectId NOT IN (153)
+                            GROUP BY AssignedToName, IssueId
+                            ORDER BY AssignedToName";
+
+            // joins way too long  :(
+            /* 
+             SELECT iss.issueid as 'Номер задачи'
+                            , strftime('%Y-%m-%d %H:%M',iss.CreatedOn) as 'Создан'
+                            , iss.AssignedToName as 'Назначена'
+                            , iss.Subject as 'Тема'
+                            FROM Issues iss 
+                                LEFT JOIN Journals jou ON iss.issueId = jou.issueId 
+                                LEFT JOIN JournalDetails jd ON jou.id = jd.journalId 
+                            WHERE iss.StatusId in ({ArrayToString(StatusIdList)})
+                                AND jd.newValue in ({ArrayToString(StatusIdList)})
+                                AND jou.CreatedOn < '{overdue}' 
+                                AND iss.AssignedToId in ({ArrayToString(UserIdList)})
+                            GROUP BY iss.AssignedToName
+                            ORDER BY iss.AssignedToName
+             */
+            return DBman.OpenQuery(query);
+        }
+
+        public int GetHours(int hoursFrom, int hoursTo, int hoursToOverdue)
+        {
+            int hours = hoursToOverdue;
+            if (DateTime.Now.DayOfWeek == DayOfWeek.Monday && (DateTime.Now.Hour - hours) < hoursFrom)
+            {
+                hours = 24 * 3 - hoursTo + hoursFrom + hours;
+            }
+            if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday)
+            {
+                hours = 24 * 2 - hoursTo + hoursFrom + hours;
+            }
+            if (DateTime.Now.DayOfWeek == DayOfWeek.Saturday)
+            {
+                hours = 24 - hoursTo + hoursFrom + hours;
+            }
+            if ((DateTime.Now.DayOfWeek == DayOfWeek.Tuesday ||
+               DateTime.Now.DayOfWeek == DayOfWeek.Wednesday ||
+               DateTime.Now.DayOfWeek == DayOfWeek.Thursday ||
+               DateTime.Now.DayOfWeek == DayOfWeek.Friday) && ((DateTime.Now.Hour - hours) < hoursFrom))
+            {
+                hours = 24 - hoursTo + hoursFrom + hours;
+            }
+            return hours;
         }
 
         public void ControlUpdate()
