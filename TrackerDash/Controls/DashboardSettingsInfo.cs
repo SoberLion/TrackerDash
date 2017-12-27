@@ -10,6 +10,10 @@ namespace TrackerHelper.Controls
 {
     public partial class DashboardSettingsInfo : UserControl
     {
+
+        public delegate void save();
+        public event save onSave;
+
         private DashboardPreset _preset;
 
         public DashboardPreset Preset
@@ -25,7 +29,10 @@ namespace TrackerHelper.Controls
 
         public void GetDict()
         {
-            string Employees = "SELECT DISTINCT AssignedToId, AssignedToName FROM Issues ORDER BY AssignedToName";
+            string Employees = @"SELECT ID, (Lastname || ' ' || FirstName) as Name
+                                FROM Users
+                                WHERE CompanyName in ('Компания UCS', 'UCS-Москва')
+                                ORDER BY Name";
             string Projects = "SELECT DISTINCT ProjectId, ProjectName FROM Issues ORDER BY ProjectName";
             string Statuses = "SELECT DISTINCT StatusId, StatusName FROM Issues ORDER BY StatusId";
 
@@ -39,50 +46,42 @@ namespace TrackerHelper.Controls
             DataRow[] StatData = DBman.OpenQuery(Statuses).Select("");
             List<Status> statList = StatData.Select(p => new Status { ID = Convert.ToInt32(p[0]), Name = p[1].ToString() }).ToList<Status>();
 
-            // intersect - with items in preset list; checked = true
-            List<IdName> IntersectEmplList = emplList.Intersect(Preset.Employees, new IdNameComparer()).ToList();
             // except - items not in preset list; checked = false
             List<IdName> ExceptEmplList = emplList.Except(Preset.Employees, new IdNameComparer()).ToList();
-            
-            //fill checkedlist eployees with checked and unchecked items
-            for (int i = 0; i < IntersectEmplList.Count; i++)
-            {
-                clbEmployees.Items.Add($"{IntersectEmplList[i].name} <{IntersectEmplList[i].id}>", true);
-            }
-            for (int i = 0; i < ExceptEmplList.Count; i++)
-            {
-                clbEmployees.Items.Add($"{ExceptEmplList[i].name} <{ExceptEmplList[i].id}>", false);
-            }
 
+            //fill checkedlist epmloyees with checked and unchecked items
+            for (int i = 0; i < Preset.Employees.Count; i++)
+                clbEmployees.Items.Add($"{Preset.Employees[i].name} <{Preset.Employees[i].id}>", true);
+           
+            for (int i = 0; i < ExceptEmplList.Count; i++)            
+                clbEmployees.Items.Add($"{ExceptEmplList[i].name} <{ExceptEmplList[i].id}>", false);
             
-            List<IdName> IntersectProjList = projList.Intersect(Preset.Projects).ToList();
-            List<IdName> ExceptProjList = projList.Except(Preset.Projects).ToList();
+
+            List<IdName> ExceptProjList = projList.Except(Preset.Projects, new IdNameComparer()).ToList();
 
             //fill checkedlist projects with checked and unchecked items
-            for (int i = 0; i < IntersectProjList.Count; i++)
-            {
-                clbProjects.Items.Add($"{IntersectProjList[i].name} <{IntersectProjList[i].id}>", true);
-            }
-            for (int i = 0; i < ExceptProjList.Count; i++)
-            {
-                clbProjects.Items.Add($"{ExceptProjList[i].name} <{ExceptProjList[i].id}>", false);
-            }
-
+            for (int i = 0; i < Preset.Projects.Count; i++)            
+                clbProjects.Items.Add($"{Preset.Projects[i].name} <{Preset.Projects[i].id}>", true);
             
-            List<Status> IntersectStatList = statList.Intersect(Preset.Statuses).ToList();
-            List<Status> ExceptStatList = statList.Except(Preset.Statuses).ToList();
+            for (int i = 0; i < ExceptProjList.Count; i++)            
+                clbProjects.Items.Add($"{ExceptProjList[i].name} <{ExceptProjList[i].id}>", false);            
+
+
+            List<Status> ExceptStatList = statList.Except(Preset.Statuses, new StatusComparer()).ToList();
 
             //fill checkedlist status with checked and unchecked items
-            for (int i = 0; i < IntersectStatList.Count; i++)
+            for (int i = 0; i < Preset.Statuses.Count; i++)
             {
-                clbStatus.Items.Add($"{IntersectStatList[i].Name} <{IntersectStatList[i].ID}>", true);
+                clbStatus.Items.Add($"{Preset.Statuses[i].Name} <{Preset.Statuses[i].ID}>", true);
+                CreateStatusHoursTextBox(Preset.Statuses[i]);
             }
             for (int i = 0; i < ExceptStatList.Count; i++)
             {
                 clbStatus.Items.Add($"{ExceptStatList[i].Name} <{ExceptStatList[i].ID}>", false);
             }
-        }
 
+            tbName.Text = Preset.Name;
+        }
         private void btnSave_Click(object sender, EventArgs e)
         {
             string emptytext = "Name must not be empty";
@@ -100,6 +99,7 @@ namespace TrackerHelper.Controls
                 Preset.Name = tbName.Text;
                 DBman.DeletePreset(Preset.ID);
                 DBman.InsertPreset(Preset);
+                onSave?.Invoke();
             }
             else
             {
@@ -118,17 +118,23 @@ namespace TrackerHelper.Controls
                 {
                     Status st = Preset.Statuses.Find(p => p.ID == Convert.ToInt32(str[1]));
                     if (st == null)
-                        Preset.Statuses.Add(new Status { Name = str[0], ID = Convert.ToInt32(str[1]) });
+                    {
+                        st = new Status { Name = str[0], ID = Convert.ToInt32(str[1]) };
+                        Preset.Statuses.Add(st);
+                        CreateStatusHoursTextBox(st);
+                    }
                 }
                 else if (e.CurrentValue == CheckState.Checked)
                 {
                     Status st = Preset.Statuses.Find(p => p.ID == Convert.ToInt32(str[1]));
                     if (st != null)
+                    {
+                        DisposeStatusHoursTextBox(st);
                         Preset.Statuses.RemoveAt(Preset.Statuses.IndexOf(st));
+                    }
                 }
             }
         }
-
         private void clbProjects_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             string[] str = clbProjects.Items[e.Index].ToString().Split('<');
@@ -150,7 +156,6 @@ namespace TrackerHelper.Controls
                 }
             }
         }
-
         private void clbEmployees_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             string[] str = clbEmployees.Items[e.Index].ToString().Split('<');
@@ -162,7 +167,7 @@ namespace TrackerHelper.Controls
                 {
                     IdName item = Preset.Employees.Find(p => p.id == Convert.ToInt32(str[1]));
                     if (item == null)
-                        Preset.Employees.Add(new IdName { name = str[0], id = Convert.ToInt32(str[1]) });
+                        Preset.Employees.Add(new IdName { name = str[0], id = Convert.ToInt32(str[1]) });                    
                 }
                 else if (e.CurrentValue == CheckState.Checked)
                 {
@@ -171,6 +176,61 @@ namespace TrackerHelper.Controls
                         Preset.Employees.RemoveAt(Preset.Employees.IndexOf(item));
                 }
             }
+        }
+        private void CreateStatusHoursTextBox(Status status)
+        {
+            Panel pnl = new Panel
+            {
+                Parent = pnlStatusHours,
+                Dock = DockStyle.Top,
+                Name = "pnl" + status.ID.ToString(),
+                Height = 40,
+                Margin = new Padding(3, 3, 3, 3)
+            };
+            TextBox tb = new TextBox
+            {
+                Parent = pnl,
+                Dock = DockStyle.Top,
+                Tag = status,
+               // Text = status.MaxHours.ToString()
+            };
+            tb.DataBindings.Add("Text", status, "MaxHours", false, DataSourceUpdateMode.OnPropertyChanged);
+            tb.TextChanged += new EventHandler(onTextBoxChanged); //onTextBoxChanged;
+            Label lbl = new Label
+            {
+                Parent = pnl,
+                Dock = DockStyle.Top,
+                Text = status.Name,
+                ForeColor = System.Drawing.Color.Gainsboro,
+                TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+            };
+        }
+        private void DisposeStatusHoursTextBox(Status status)
+        {
+            Panel pnl = Controls.Find("pnl"+status.ID, true).FirstOrDefault() as Panel;
+            if (pnl != null)
+                pnl.Dispose();
+        }
+        private void onTextBoxChanged(object sender, EventArgs e)
+        {
+            if (sender is TextBox tb)
+            {
+                if (tb.Text != string.Empty)
+                {
+                    Status st = Preset.Statuses.Find(p => p.ID == (tb.Tag as Status).ID);
+                    if (st != null)
+                        st.MaxHours = Convert.ToInt32(tb.Text);
+                }
+            }
+        }
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            Dispose();
+        }
+
+        private void tbStatusFilter_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

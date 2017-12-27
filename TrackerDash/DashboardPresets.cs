@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
 using TrackerHelper.RedmineEntities;
+using System.ComponentModel;
 
 namespace TrackerHelper
 {
-    public class Status
+    public class Status : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         private int _id;
         private string _name;
         private int _maxHours = 0;
@@ -22,9 +25,34 @@ namespace TrackerHelper
         public int MaxHours
         {
             get { return _maxHours; }
-            set { _maxHours = value; }
+            set
+            {
+                if (value != this.MaxHours)
+                {
+                    _maxHours = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("MaxHours"));
+                }
+            }
+        }        
+    }
+    public class StatusComparer : IEqualityComparer<Status>
+    {
+        
+
+        public bool Equals(Status x, Status y)
+        {
+            return x.ID.Equals(y.ID);
+        }
+
+        public int GetHashCode(Status obj)
+        {
+            if (object.ReferenceEquals(obj, null))
+                return 0;
+
+            return obj.ID.GetHashCode();
         }
     }
+
     public class DashboardPreset
     {
         private static int _counter = 0;

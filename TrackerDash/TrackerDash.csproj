@@ -88,6 +88,9 @@
     <Compile Include="Controls\CustomProgressBar.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Controls\Dashboard.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Interfaces\IDashboardControlsUpdate.cs" />
     <Compile Include="Controls\DashboardIssues.cs">
       <SubType>UserControl</SubType>

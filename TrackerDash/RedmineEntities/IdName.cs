@@ -28,7 +28,7 @@ namespace TrackerHelper.RedmineEntities
     {
         public bool Equals(IdName x, IdName y)
         {
-            return x.id.Equals(y.id) && x.name.Equals(y.name);
+            return x.id.Equals(y.id);
         }
 
         public int GetHashCode(IdName obj)

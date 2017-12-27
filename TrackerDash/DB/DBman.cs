@@ -1129,10 +1129,10 @@ namespace TrackerHelper.DB
             DataTable dt = null;
             if (sql.Length > 0)
             {
-                using (SQLiteConnection connection = new SQLiteConnection($"Data Source={_dbName}; Version=3;"))
+                using (SQLiteConnection conn = new SQLiteConnection($"Data Source={_dbName}; Version=3;"))
                 {
-                    connection.Open();
-                    SQLiteDataAdapter dataAdapter = new SQLiteDataAdapter(sql, connection);
+                    conn.Open();
+                    SQLiteDataAdapter dataAdapter = new SQLiteDataAdapter(sql, conn);
                     DataSet dataSet = new DataSet();
                     dataSet.Reset();
                     dataAdapter.Fill(dataSet);
@@ -1141,153 +1141,29 @@ namespace TrackerHelper.DB
             }
             return dt;
         }
-
-        /// Get list of isssues Created between dates grouped by days
-        /// <param name="DateFrom">string, format yyyy-MM-dd mm:hh:ss:ttt</param>
-        /// <param name="DateTo">string, format yyyy-MM-dd mm:hh:ss:ttt</param>
-        /// <param name="ProjectId">string, might be empty</param>
-        public static List<string[]> GetIssuesCountGroupedByDay(string DateFrom, string DateTo, string ProjectId, GroupFormat groupFormat, IssueType type)
+        public static void OpenQuery2(string sql)
         {
-            List<string[]> mas = new List<string[]>();
-
             using (SQLiteConnection conn = new SQLiteConnection($"Data Source={_dbName}; Version=3;"))
             {
                 conn.Open();
 
-                if (conn.State == ConnectionState.Open)
+                using (SQLiteCommand cmd = conn.CreateCommand())
                 {
-                    using (SQLiteCommand cmd = conn.CreateCommand())
+                    cmd.CommandText = sql;
+                    try
                     {
-                        //    cmd.CommandText = "SELECT * FROM Issues WHERE CreatedOn >= '@DateFrom' AND CreatedOn < '@DateTo' @ProjectId";
-                        if (ProjectId != "")
-                        {
-                            ProjectId = $"and ProjectId in ({ProjectId})";
-                        }
-                        else
-                            ProjectId = "";
-
-                        string GroupingFormat = "%Y";
-
-                        switch (groupFormat)
-                        {
-                            case (GroupFormat.Day):
-                                {
-                                    GroupingFormat = "%Y-%m-%d";
-                                    break;
-                                }
-                            case (GroupFormat.Month):
-                                {
-                                    GroupingFormat = "%Y-%m";
-                                    break;
-                                }
-                            case (GroupFormat.Year):
-                                {
-                                    GroupingFormat = "%Y";
-                                    break;
-                                }
-                        }
-
-                        string createdOn = $"SELECT strftime('{GroupingFormat}', CreatedOn) as CreatedOn, count(*) as number FROM Issues WHERE CreatedOn >= '{DateFrom}' AND CreatedOn < '{DateTo}' {ProjectId} GROUP BY strftime('{GroupingFormat}', CreatedOn)";
-                        string closedOn = $"SELECT strftime('{GroupingFormat}', ClosedOn) as ClosedOn, count(*) as number FROM Issues WHERE ClosedOn >= '{DateFrom}' AND ClosedOn < '{DateTo}' {ProjectId} GROUP BY strftime('{GroupingFormat}', ClosedOn)";
-
-                        switch (type)
-                        {
-                            case (IssueType.Created):
-                                {
-                                    cmd.CommandText = createdOn;
-                                    break;
-                                }
-                            case (IssueType.Closed):
-                                {
-                                    cmd.CommandText = closedOn;
-                                    break;
-                                }
-                        }
-
-                        try
-                        {
-                            SQLiteDataReader r = cmd.ExecuteReader();
-                            while (r.Read())
-                            {
-                                string[] str = new string[] { r.GetString(0), r.GetDecimal(1).ToString() };
-                                mas.Add(str);
-                            }
-                            r.Close();
-                        }
-                        catch (SQLiteException sqlex)
-                        {
-                            onError?.Invoke($"Error: {sqlex.Message}");
-                        }
+                        cmd.ExecuteNonQuery();
                     }
-                }
+                    catch (SQLiteException sqlex)
+                    {
+                        onError?.Invoke($"SQLiteException: {sqlex.Message}");
+                    }
+                    catch (Exception ex)
+                    {
+                        onError?.Invoke($"Exception: {ex.Message}");
+                    }
+                }                
             }
-            return mas;
-        }
-
-        /// Get min or max date for user existed in DB,
-        /// <param name="UserId">string, UserID</param>
-        /// <param name="isMIN">true if needed min, false if max</param>
-        public static string GetDate(string UserId, bool isMIN)
-        {
-
-            SQLiteConnection conn = new SQLiteConnection($"Data Source={_dbName}; Version=3;");
-            Object obj = "";
-
-            conn.Open();
-
-            if (conn.State == ConnectionState.Open)
-            {
-                SQLiteCommand cmd = conn.CreateCommand();
-                if (isMIN == true)
-                    cmd.CommandText = "SELECT MIN(SpentOn) FROM TimeEntries where UserId = @UserId";
-                else
-                    cmd.CommandText = "SELECT MAX(SpentOn) FROM TimeEntries where UserId = @UserId";
-
-                cmd.Parameters.AddWithValue("@UserId", UserId);
-                try
-                {
-                    obj = cmd.ExecuteScalar();
-                }
-                catch (SQLiteException sqlex)
-                {
-                    onError?.Invoke($"Error: {sqlex.Message}");
-                    return null;
-                }
-                cmd.Dispose();
-                conn.Dispose();
-            }
-            return (obj.ToString() != "") ? obj.ToString() : "1970-01-01";
-
-        }
-        // calc time for user
-        public static string CalcTime(string UserId, string DateFrom, string DateTo)
-        {
-            SQLiteConnection conn = new SQLiteConnection($"Data Source={_dbName}; Version=3;");
-            Object obj = "";
-
-            conn.Open();
-
-            if (conn.State == ConnectionState.Open)
-            {
-                SQLiteCommand cmd = conn.CreateCommand();
-                cmd.CommandText = "SELECT SUM(Hours) FROM (SELECT Hours FROM TimeEntries where UserId = @UserId and (SpentOn between @DateFrom and @DateTo));";
-                cmd.Parameters.AddWithValue("@UserId", UserId);
-                cmd.Parameters.AddWithValue("@DateFrom", (DateFrom + " 00:00:00.000"));
-                cmd.Parameters.AddWithValue("@DateTo", (DateTo + " 23:59:59.999"));
-
-                try
-                {
-                    obj = cmd.ExecuteScalar();
-                }
-                catch (SQLiteException sqlex)
-                {
-                    onError?.Invoke($"Error: {sqlex.Message}");
-                    return "0,00";
-                }
-                cmd.Dispose();
-                conn.Dispose();
-            }
-            return (obj.ToString() == "") ? "0,00" : Math.Round(double.Parse(obj.ToString()), 2).ToString();
         }
 
         public static void GetOpenedIssues(Issues issues, int NumOfDays)
@@ -1349,39 +1225,6 @@ namespace TrackerHelper.DB
             }
         }
 
-
-        // TODO replace this method with OpenQuery
-        public static Dictionary<string, int> GetGroupedData(string id, string name)
-        {
-            Dictionary<string, int> dict = new Dictionary<string, int>();
-            SQLiteConnection conn = new SQLiteConnection($"Data Source={_dbName}; Version=3;");
-
-            conn.Open();
-
-            if (conn.State == ConnectionState.Open)
-            {
-                SQLiteCommand cmd = conn.CreateCommand();
-                cmd.CommandText = $"SELECT Count({name}) as {id}, {name} FROM Issues WHERE ProjectId = 26 and StatusId not in (3,5,6,19,26,27,29,30) GROUP BY {name} ORDER BY {name} DESC";
-
-                try
-                {
-                    SQLiteDataReader r = cmd.ExecuteReader();
-                    while (r.Read())
-                    {
-                        dict.Add(r[name].ToString(), int.Parse(r[id].ToString()));
-                    }
-                    r.Close();
-                }
-                catch (SQLiteException sqlex)
-                {
-                    onError?.Invoke($"Error: {sqlex.Message}");
-                }
-                cmd.Dispose();
-                conn.Dispose();
-            }
-            return dict.Count > 0 ? dict : null;
-        }
-
         public static void GetIssuesListByUserId(string UserId, Issues issues)
         {
             SQLiteConnection conn = new SQLiteConnection($"Data Source={_dbName}; Version=3;");
@@ -1436,10 +1279,217 @@ namespace TrackerHelper.DB
             }
         }
 
-
-        /*public static List<DashboardPreset> GetPresetLIst()
+        public static List<DashboardPreset> GetPresetList()
         {
-        }*/
+            List<DashboardPreset> presetList = new List<DashboardPreset>();
+            using (SQLiteConnection conn = new SQLiteConnection($"Data Source={_dbName}; Version=3;"))
+            {
+                conn.Open();
+
+                if (conn.State == ConnectionState.Open)
+                {
+                    using (SQLiteCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = $"SELECT * FROM Presets p";
+                        try
+                        {
+                            SQLiteDataReader r = cmd.ExecuteReader();
+                            while (r.Read())
+                            {
+                                DashboardPreset preset = new DashboardPreset();
+                                preset.ID = Convert.ToInt32(r["PresetID"].ToString());
+                                preset.Name = r["PresetName"].ToString();
+                                preset.isActive = Convert.ToInt32(r["isActive"].ToString()) == 0 ? false : true;
+                                presetList.Add(preset);
+                            }
+                            r.Close();
+                        }
+                        catch (SQLiteException sqlex)
+                        {
+                            onError?.Invoke($"SQLiteException: {sqlex.Message}");
+                        }
+                        catch (Exception ex)
+                        {
+                            onError?.Invoke($"Exception: {ex.Message}");
+                        }
+                    }
+                }
+            }
+            for(int i = 0; i< presetList.Count;i++)
+            {
+                presetList[i].Projects = GetPresetProjects(presetList[i].ID);
+                presetList[i].Employees = GetPresetEmployees(presetList[i].ID);
+                presetList[i].Statuses = GetPresetStatuses(presetList[i].ID);
+            }
+
+            return presetList;
+        }
+        public static DashboardPreset GetActivePreset()
+        {
+            DashboardPreset preset = null;
+            using (SQLiteConnection conn = new SQLiteConnection($"Data Source={_dbName}; Version=3;"))
+            {
+                conn.Open();
+
+                if (conn.State == ConnectionState.Open)
+                {
+                    using (SQLiteCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = $"SELECT * FROM Presets WHERE isActive = 1";
+                        try
+                        {
+                            SQLiteDataReader r = cmd.ExecuteReader();
+                            while (r.Read())
+                            {
+                                preset = new DashboardPreset();
+                                preset.ID = Convert.ToInt32(r["PresetID"].ToString());
+                                preset.Name = r["PresetName"].ToString();
+                                preset.isActive = Convert.ToInt32(r["isActive"].ToString()) == 0 ? false : true;
+                            }
+                            r.Close();
+                        }
+                        catch (SQLiteException sqlex)
+                        {
+                            onError?.Invoke($"SQLiteException: {sqlex.Message}");
+                        }
+                        catch (Exception ex)
+                        {
+                            onError?.Invoke($"Exception: {ex.Message}");
+                        }
+                    }
+                }
+            }
+            if (preset != null)
+            {
+                preset.Projects = GetPresetProjects(preset.ID);
+                preset.Employees = GetPresetEmployees(preset.ID);
+                preset.Statuses = GetPresetStatuses(preset.ID);
+            }            
+            return preset;
+        }
+        private static List<IdName> GetPresetProjects(int PresetId)
+        {
+            List<IdName> projectslist = new List<IdName>();
+
+            using (SQLiteConnection conn = new SQLiteConnection($"Data Source={_dbName}; Version=3;"))
+            {
+                conn.Open();
+
+                if (conn.State == ConnectionState.Open)
+                {
+                    using (SQLiteCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = $"SELECT * FROM PresetsProjects WHERE PresetId = {PresetId}";
+                        try
+                        {
+                            using (SQLiteDataReader r = cmd.ExecuteReader())
+                            {
+                                while (r.Read())
+                                {
+                                    IdName project = new IdName();
+                                    project.id = int.Parse(r["ProjId"].ToString());
+                                    project.name = r["ProjName"].ToString();
+
+                                    projectslist.Add(project);
+                                }
+                            }
+                        }
+                        catch (SQLiteException sqlex)
+                        {
+                            onError?.Invoke($"SQLiteException: {sqlex.Message}");
+                        }
+                        catch (Exception ex)
+                        {
+                            onError?.Invoke($"Exception: {ex.Message}");
+                        }
+                    }
+                }
+            }
+
+            return projectslist;
+        }
+        private static List<IdName> GetPresetEmployees(int PresetId)
+        {
+            List<IdName> employeesList = new List<IdName>();
+
+            using (SQLiteConnection conn = new SQLiteConnection($"Data Source={_dbName}; Version=3;"))
+            {
+                conn.Open();
+
+                if (conn.State == ConnectionState.Open)
+                {
+                    using (SQLiteCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = $"SELECT * FROM PresetsEmployees WHERE PresetId = {PresetId}";
+                        try
+                        {
+                            using (SQLiteDataReader r = cmd.ExecuteReader())
+                            {
+                                while (r.Read())
+                                {
+                                    IdName employee = new IdName();
+                                    employee.id = int.Parse(r["EmplId"].ToString());
+                                    employee.name = r["EmplName"].ToString();
+
+                                    employeesList.Add(employee);
+                                }
+                            }
+                        }
+                        catch (SQLiteException sqlex)
+                        {
+                            onError?.Invoke($"SQLiteException: {sqlex.Message}");
+                        }
+                        catch (Exception ex)
+                        {
+                            onError?.Invoke($"Exception: {ex.Message}");
+                        }
+                    }
+                }
+            }
+
+            return employeesList;
+        }
+        private static List<Status> GetPresetStatuses(int PresetId)
+        {
+            List<Status> StatusesList = new List<Status>();
+
+            using (SQLiteConnection conn = new SQLiteConnection($"Data Source={_dbName}; Version=3;"))
+            {
+                conn.Open();
+
+                if (conn.State == ConnectionState.Open)
+                {
+                    using (SQLiteCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = $"SELECT * FROM PresetsStatus WHERE PresetId = {PresetId}";
+                        try
+                        {
+                            using (SQLiteDataReader r = cmd.ExecuteReader())
+                            {
+                                while (r.Read())
+                                {
+                                    Status status = new Status();
+                                    status.ID = int.Parse(r["StatusId"].ToString());
+                                    status.Name = r["StatusName"].ToString();
+                                    status.MaxHours = int.Parse(r["MaxHours"].ToString());
+                                    StatusesList.Add(status);
+                                }
+                            }
+                        }
+                        catch (SQLiteException sqlex)
+                        {
+                            onError?.Invoke($"SQLiteException: {sqlex.Message}");
+                        }
+                        catch (Exception ex)
+                        {
+                            onError?.Invoke($"Exception: {ex.Message}");
+                        }
+                    }
+                }
+            }
+
+            return StatusesList;
+        }
         #endregion
     }
 }
