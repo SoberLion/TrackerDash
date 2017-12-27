@@ -76,6 +76,7 @@ namespace TrackerHelper.Controls
 
         public void UpdateTSDashboard()
         {
+            pnlSplash.Visible = true;
             CartesianChartStackedColumns();
 
             FilterBtnClick(btnWeek, EventArgs.Empty);
@@ -84,7 +85,6 @@ namespace TrackerHelper.Controls
             UpdateLblStatusValue(lblStatusAssignedValue, "9");
             UpdateLblStatusValue(lblStatusNeedInfoEmplValue, "18");
             UpdateLblStatusValue(lblStatusEscalatedValue, "22");
-
 
             CreateUsersButtons();
             tmrSplash.Enabled = true;

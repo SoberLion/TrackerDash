@@ -45,9 +45,10 @@ namespace TrackerHelper
 
         public Dashboard()
         {
-           InitializeComponent();
-           GetActivePreset();
+            InitializeComponent();
+            GetActivePreset();
             CreateDashboards();
+            btnSlideshow_Click(btnSlideshow,EventArgs.Empty);
          /*   IntPtr ptr = CreateRoundRectRgn(0, 0, this.Width, this.Height, 25, 25);
             this.Region = Region.FromHrgn(ptr);
             DeleteObject(ptr);*/
@@ -98,8 +99,11 @@ namespace TrackerHelper
             btnNeedInfoEmpl.BackColor = Color.FromArgb(41, 53, 65);
             btnEscalated.Check = false;
             btnEscalated.BackColor = Color.FromArgb(41, 53, 65);
+            btnSlideshow.Check = false;
+            btnSlideshow.BackColor = Color.FromArgb(41, 53, 65);
             chbtn_Settings.Check = false;
             chbtn_Settings.BackColor = Color.FromArgb(41, 53, 65);
+
 
             (sender as CheckedButton).Check = true;
             (sender as CheckedButton).BackColor = Color.FromArgb(21, 33, 45);
@@ -238,7 +242,6 @@ namespace TrackerHelper
             _dashboardList.Add(getIssuesStatus(9));
             _dashboardList.Add(getIssuesStatus(18));
             _dashboardList.Add(getIssuesStatus(22));
-            tmrSlideShow.Enabled = true;
         }
 
         public IDashboardControlsUpdate getIssuesStatus(int statusId)
@@ -317,6 +320,25 @@ namespace TrackerHelper
         {
             _dashboardList[SlideCounter % _dashboardList.Count].ControlUpdate();
             SlideCounter++; 
+        }
+
+        private void btnSlideshow_CheckedChange(object sender, EventArgs e)
+        {
+            if (sender is CheckedButton chb)
+            {
+                if (chb.Check == true)
+                    tmrSlideShow.Enabled = false;
+                else
+                {
+                    tmrSlideShow.Enabled = true;
+                    tmrSlideShow_Tick(tmrSlideShow, EventArgs.Empty);
+                }
+            }
+        }
+
+        private void btnSlideshow_Click(object sender, EventArgs e)
+        {
+            Toggle(sender);
         }
     }
 }
