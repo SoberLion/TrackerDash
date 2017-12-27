@@ -35,17 +35,18 @@
             this.pnlStatus = new System.Windows.Forms.Panel();
             this.clbStatus = new System.Windows.Forms.CheckedListBox();
             this.pnlStatusPreset = new System.Windows.Forms.Panel();
+            this.pnlStatusHours = new System.Windows.Forms.Panel();
             this.plnLayoutTop = new System.Windows.Forms.Panel();
             this.pnlLayoutTopButtons = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
+            this.lblMaxTimeInStatus = new System.Windows.Forms.Label();
             this.tbName = new System.Windows.Forms.TextBox();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnClose = new System.Windows.Forms.Button();
-            this.pnlStatusHours = new System.Windows.Forms.Panel();
             this.pnlTextBoxFilters = new System.Windows.Forms.Panel();
-            this.tbEmplFilter = new System.Windows.Forms.TextBox();
-            this.tbProjFilter = new System.Windows.Forms.TextBox();
             this.tbStatusFilter = new System.Windows.Forms.TextBox();
+            this.tbProjFilter = new System.Windows.Forms.TextBox();
+            this.tbEmplFilter = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.pnlEmployees.SuspendLayout();
             this.pnlProjects.SuspendLayout();
             this.pnlStatus.SuspendLayout();
@@ -57,8 +58,12 @@
             // 
             // clbEmployees
             // 
+            this.clbEmployees.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(53)))), ((int)(((byte)(65)))));
+            this.clbEmployees.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.clbEmployees.CheckOnClick = true;
             this.clbEmployees.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.clbEmployees.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.clbEmployees.ForeColor = System.Drawing.Color.Gainsboro;
             this.clbEmployees.FormattingEnabled = true;
             this.clbEmployees.Location = new System.Drawing.Point(0, 0);
             this.clbEmployees.Name = "clbEmployees";
@@ -86,8 +91,12 @@
             // 
             // clbProjects
             // 
+            this.clbProjects.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(53)))), ((int)(((byte)(65)))));
+            this.clbProjects.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.clbProjects.CheckOnClick = true;
             this.clbProjects.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.clbProjects.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.clbProjects.ForeColor = System.Drawing.Color.Gainsboro;
             this.clbProjects.FormattingEnabled = true;
             this.clbProjects.Location = new System.Drawing.Point(0, 0);
             this.clbProjects.Name = "clbProjects";
@@ -106,8 +115,12 @@
             // 
             // clbStatus
             // 
+            this.clbStatus.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(53)))), ((int)(((byte)(65)))));
+            this.clbStatus.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.clbStatus.CheckOnClick = true;
             this.clbStatus.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.clbStatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.clbStatus.ForeColor = System.Drawing.Color.Gainsboro;
             this.clbStatus.FormattingEnabled = true;
             this.clbStatus.Location = new System.Drawing.Point(0, 0);
             this.clbStatus.Name = "clbStatus";
@@ -124,6 +137,14 @@
             this.pnlStatusPreset.Size = new System.Drawing.Size(816, 885);
             this.pnlStatusPreset.TabIndex = 4;
             // 
+            // pnlStatusHours
+            // 
+            this.pnlStatusHours.Dock = System.Windows.Forms.DockStyle.Left;
+            this.pnlStatusHours.Location = new System.Drawing.Point(0, 0);
+            this.pnlStatusHours.Name = "pnlStatusHours";
+            this.pnlStatusHours.Size = new System.Drawing.Size(200, 885);
+            this.pnlStatusHours.TabIndex = 0;
+            // 
             // plnLayoutTop
             // 
             this.plnLayoutTop.Controls.Add(this.pnlLayoutTopButtons);
@@ -135,7 +156,7 @@
             // 
             // pnlLayoutTopButtons
             // 
-            this.pnlLayoutTopButtons.Controls.Add(this.label1);
+            this.pnlLayoutTopButtons.Controls.Add(this.lblMaxTimeInStatus);
             this.pnlLayoutTopButtons.Controls.Add(this.tbName);
             this.pnlLayoutTopButtons.Controls.Add(this.btnSave);
             this.pnlLayoutTopButtons.Controls.Add(this.btnClose);
@@ -145,16 +166,16 @@
             this.pnlLayoutTopButtons.Size = new System.Drawing.Size(1716, 50);
             this.pnlLayoutTopButtons.TabIndex = 1;
             // 
-            // label1
+            // lblMaxTimeInStatus
             // 
-            this.label1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.label1.ForeColor = System.Drawing.SystemColors.Window;
-            this.label1.Location = new System.Drawing.Point(15, 8);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(163, 13);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Название предустановки";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblMaxTimeInStatus.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.lblMaxTimeInStatus.ForeColor = System.Drawing.SystemColors.Window;
+            this.lblMaxTimeInStatus.Location = new System.Drawing.Point(15, 8);
+            this.lblMaxTimeInStatus.Name = "lblMaxTimeInStatus";
+            this.lblMaxTimeInStatus.Size = new System.Drawing.Size(163, 13);
+            this.lblMaxTimeInStatus.TabIndex = 3;
+            this.lblMaxTimeInStatus.Text = "Название предустановки";
+            this.lblMaxTimeInStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // tbName
             // 
@@ -187,20 +208,13 @@
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(75, 50);
             this.btnClose.TabIndex = 0;
-            this.btnClose.Text = "Cancel";
+            this.btnClose.Text = "Close";
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
-            // pnlStatusHours
-            // 
-            this.pnlStatusHours.Dock = System.Windows.Forms.DockStyle.Left;
-            this.pnlStatusHours.Location = new System.Drawing.Point(0, 0);
-            this.pnlStatusHours.Name = "pnlStatusHours";
-            this.pnlStatusHours.Size = new System.Drawing.Size(200, 885);
-            this.pnlStatusHours.TabIndex = 0;
-            // 
             // pnlTextBoxFilters
             // 
+            this.pnlTextBoxFilters.Controls.Add(this.label2);
             this.pnlTextBoxFilters.Controls.Add(this.tbStatusFilter);
             this.pnlTextBoxFilters.Controls.Add(this.tbProjFilter);
             this.pnlTextBoxFilters.Controls.Add(this.tbEmplFilter);
@@ -210,12 +224,13 @@
             this.pnlTextBoxFilters.Size = new System.Drawing.Size(1716, 30);
             this.pnlTextBoxFilters.TabIndex = 1;
             // 
-            // tbEmplFilter
+            // tbStatusFilter
             // 
-            this.tbEmplFilter.Location = new System.Drawing.Point(15, 5);
-            this.tbEmplFilter.Name = "tbEmplFilter";
-            this.tbEmplFilter.Size = new System.Drawing.Size(270, 20);
-            this.tbEmplFilter.TabIndex = 0;
+            this.tbStatusFilter.Location = new System.Drawing.Point(615, 5);
+            this.tbStatusFilter.Name = "tbStatusFilter";
+            this.tbStatusFilter.Size = new System.Drawing.Size(270, 20);
+            this.tbStatusFilter.TabIndex = 2;
+            this.tbStatusFilter.TextChanged += new System.EventHandler(this.tbStatusFilter_TextChanged);
             // 
             // tbProjFilter
             // 
@@ -224,13 +239,23 @@
             this.tbProjFilter.Size = new System.Drawing.Size(270, 20);
             this.tbProjFilter.TabIndex = 1;
             // 
-            // tbStatusFilter
+            // tbEmplFilter
             // 
-            this.tbStatusFilter.Location = new System.Drawing.Point(615, 5);
-            this.tbStatusFilter.Name = "tbStatusFilter";
-            this.tbStatusFilter.Size = new System.Drawing.Size(270, 20);
-            this.tbStatusFilter.TabIndex = 2;
-            this.tbStatusFilter.TextChanged += new System.EventHandler(this.tbStatusFilter_TextChanged);
+            this.tbEmplFilter.Location = new System.Drawing.Point(15, 5);
+            this.tbEmplFilter.Name = "tbEmplFilter";
+            this.tbEmplFilter.Size = new System.Drawing.Size(270, 20);
+            this.tbEmplFilter.TabIndex = 0;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label2.ForeColor = System.Drawing.Color.Gainsboro;
+            this.label2.Location = new System.Drawing.Point(928, 6);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(142, 16);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "Max Time in Status ";
             // 
             // DashboardSettingsInfo
             // 
@@ -269,7 +294,7 @@
         private System.Windows.Forms.Panel plnLayoutTop;
         private System.Windows.Forms.Panel pnlLayoutTopButtons;
         private System.Windows.Forms.Button btnSave;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblMaxTimeInStatus;
         private System.Windows.Forms.TextBox tbName;
         private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.Panel pnlTextBoxFilters;
@@ -277,5 +302,6 @@
         private System.Windows.Forms.TextBox tbEmplFilter;
         private System.Windows.Forms.TextBox tbStatusFilter;
         private System.Windows.Forms.TextBox tbProjFilter;
+        private System.Windows.Forms.Label label2;
     }
 }

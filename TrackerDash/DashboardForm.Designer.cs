@@ -31,24 +31,25 @@
             this.components = new System.ComponentModel.Container();
             this.pnlLayoutLeft = new System.Windows.Forms.Panel();
             this.pnlBtns = new System.Windows.Forms.Panel();
+            this.pnlHeader = new System.Windows.Forms.Panel();
+            this.lblLastUpdate = new System.Windows.Forms.Label();
+            this.lblCaption = new System.Windows.Forms.Label();
+            this.btnUpdate = new System.Windows.Forms.Button();
+            this.btnClose = new System.Windows.Forms.Button();
+            this.pnlDashboard = new System.Windows.Forms.Panel();
+            this.pnlVertDivider = new System.Windows.Forms.Panel();
+            this.pnlLayoutRight = new System.Windows.Forms.Panel();
+            this.pnlHorizDivider = new System.Windows.Forms.Panel();
+            this.bgWorker = new System.ComponentModel.BackgroundWorker();
+            this.tmrUpdate = new System.Windows.Forms.Timer(this.components);
+            this.tmrSlideShow = new System.Windows.Forms.Timer(this.components);
+            this.pbBGWork = new TrackerHelper.customProgressBar();
             this.chbtn_Settings = new TrackerHelper.CheckedButton();
             this.btnEscalated = new TrackerHelper.CheckedButton();
             this.btnNeedInfoEmpl = new TrackerHelper.CheckedButton();
             this.btnAssigned = new TrackerHelper.CheckedButton();
             this.btnNew = new TrackerHelper.CheckedButton();
             this.btnTechSupp = new TrackerHelper.CheckedButton();
-            this.pnlHeader = new System.Windows.Forms.Panel();
-            this.lblLastUpdate = new System.Windows.Forms.Label();
-            this.lblCaption = new System.Windows.Forms.Label();
-            this.btnUpdate = new System.Windows.Forms.Button();
-            this.btnClose = new System.Windows.Forms.Button();
-            this.pbBGWork = new TrackerHelper.customProgressBar();
-            this.pnlDashboard = new System.Windows.Forms.Panel();
-            this.pnlVertDivider = new System.Windows.Forms.Panel();
-            this.pnlLayoutRight = new System.Windows.Forms.Panel();
-            this.pnlHorizDivider = new System.Windows.Forms.Panel();
-            this.bgWorker = new System.ComponentModel.BackgroundWorker();
-            this.timer = new System.Windows.Forms.Timer(this.components);
             this.pnlLayoutLeft.SuspendLayout();
             this.pnlBtns.SuspendLayout();
             this.pnlHeader.SuspendLayout();
@@ -78,6 +79,141 @@
             this.pnlBtns.Name = "pnlBtns";
             this.pnlBtns.Size = new System.Drawing.Size(200, 672);
             this.pnlBtns.TabIndex = 1;
+            // 
+            // pnlHeader
+            // 
+            this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(53)))), ((int)(((byte)(65)))));
+            this.pnlHeader.Controls.Add(this.lblLastUpdate);
+            this.pnlHeader.Controls.Add(this.lblCaption);
+            this.pnlHeader.Controls.Add(this.btnUpdate);
+            this.pnlHeader.Controls.Add(this.btnClose);
+            this.pnlHeader.Controls.Add(this.pbBGWork);
+            this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlHeader.Location = new System.Drawing.Point(4, 0);
+            this.pnlHeader.Name = "pnlHeader";
+            this.pnlHeader.Size = new System.Drawing.Size(1030, 50);
+            this.pnlHeader.TabIndex = 0;
+            this.pnlHeader.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pnlHeader_MouseDoubleClick);
+            this.pnlHeader.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panel3_MouseDown);
+            // 
+            // lblLastUpdate
+            // 
+            this.lblLastUpdate.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.lblLastUpdate.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.lblLastUpdate.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(88)))), ((int)(((byte)(86)))));
+            this.lblLastUpdate.Location = new System.Drawing.Point(537, 12);
+            this.lblLastUpdate.Name = "lblLastUpdate";
+            this.lblLastUpdate.Size = new System.Drawing.Size(400, 24);
+            this.lblLastUpdate.TabIndex = 4;
+            this.lblLastUpdate.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // lblCaption
+            // 
+            this.lblCaption.AutoSize = true;
+            this.lblCaption.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.lblCaption.ForeColor = System.Drawing.Color.White;
+            this.lblCaption.Location = new System.Drawing.Point(65, 17);
+            this.lblCaption.Name = "lblCaption";
+            this.lblCaption.Size = new System.Drawing.Size(0, 16);
+            this.lblCaption.TabIndex = 1;
+            // 
+            // btnUpdate
+            // 
+            this.btnUpdate.FlatAppearance.BorderSize = 0;
+            this.btnUpdate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnUpdate.Location = new System.Drawing.Point(12, 12);
+            this.btnUpdate.Name = "btnUpdate";
+            this.btnUpdate.Size = new System.Drawing.Size(25, 25);
+            this.btnUpdate.TabIndex = 2;
+            this.btnUpdate.UseVisualStyleBackColor = true;
+            this.btnUpdate.Click += new System.EventHandler(this.btnUpdate_Click);
+            // 
+            // btnClose
+            // 
+            this.btnClose.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(53)))), ((int)(((byte)(65)))));
+            this.btnClose.Dock = System.Windows.Forms.DockStyle.Right;
+            this.btnClose.FlatAppearance.BorderSize = 0;
+            this.btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnClose.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnClose.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(88)))), ((int)(((byte)(86)))));
+            this.btnClose.Location = new System.Drawing.Point(943, 0);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(87, 49);
+            this.btnClose.TabIndex = 1;
+            this.btnClose.Text = "CLOSE";
+            this.btnClose.UseVisualStyleBackColor = false;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            // 
+            // pnlDashboard
+            // 
+            this.pnlDashboard.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(53)))), ((int)(((byte)(65)))));
+            this.pnlDashboard.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlDashboard.Location = new System.Drawing.Point(4, 50);
+            this.pnlDashboard.Name = "pnlDashboard";
+            this.pnlDashboard.Size = new System.Drawing.Size(1030, 622);
+            this.pnlDashboard.TabIndex = 2;
+            // 
+            // pnlVertDivider
+            // 
+            this.pnlVertDivider.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(21)))), ((int)(((byte)(33)))), ((int)(((byte)(45)))));
+            this.pnlVertDivider.Dock = System.Windows.Forms.DockStyle.Left;
+            this.pnlVertDivider.Location = new System.Drawing.Point(0, 0);
+            this.pnlVertDivider.Name = "pnlVertDivider";
+            this.pnlVertDivider.Size = new System.Drawing.Size(4, 672);
+            this.pnlVertDivider.TabIndex = 3;
+            // 
+            // pnlLayoutRight
+            // 
+            this.pnlLayoutRight.Controls.Add(this.pnlHorizDivider);
+            this.pnlLayoutRight.Controls.Add(this.pnlDashboard);
+            this.pnlLayoutRight.Controls.Add(this.pnlHeader);
+            this.pnlLayoutRight.Controls.Add(this.pnlVertDivider);
+            this.pnlLayoutRight.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlLayoutRight.Location = new System.Drawing.Point(200, 0);
+            this.pnlLayoutRight.Name = "pnlLayoutRight";
+            this.pnlLayoutRight.Size = new System.Drawing.Size(1034, 672);
+            this.pnlLayoutRight.TabIndex = 4;
+            // 
+            // pnlHorizDivider
+            // 
+            this.pnlHorizDivider.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(21)))), ((int)(((byte)(33)))), ((int)(((byte)(45)))));
+            this.pnlHorizDivider.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlHorizDivider.Location = new System.Drawing.Point(4, 50);
+            this.pnlHorizDivider.Name = "pnlHorizDivider";
+            this.pnlHorizDivider.Size = new System.Drawing.Size(1030, 4);
+            this.pnlHorizDivider.TabIndex = 4;
+            // 
+            // bgWorker
+            // 
+            this.bgWorker.WorkerReportsProgress = true;
+            this.bgWorker.WorkerSupportsCancellation = true;
+            this.bgWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgWorker_DoWork);
+            this.bgWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bgWorker_ProgressChanged);
+            this.bgWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgWorker_RunWorkerCompleted);
+            // 
+            // tmrUpdate
+            // 
+            this.tmrUpdate.Interval = 300000;
+            this.tmrUpdate.Tick += new System.EventHandler(this.timer_Tick);
+            // 
+            // tmrSlideShow
+            // 
+            this.tmrSlideShow.Interval = 30000;
+            this.tmrSlideShow.Tick += new System.EventHandler(this.tmrSlideShow_Tick);
+            // 
+            // pbBGWork
+            // 
+            this.pbBGWork.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.pbBGWork.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.pbBGWork.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(88)))), ((int)(((byte)(86)))));
+            this.pbBGWork.Location = new System.Drawing.Point(0, 49);
+            this.pbBGWork.Margin = new System.Windows.Forms.Padding(11, 9, 11, 9);
+            this.pbBGWork.Name = "pbBGWork";
+            this.pbBGWork.ProgressColor = System.Drawing.Color.Gainsboro;
+            this.pbBGWork.ProgressText = "";
+            this.pbBGWork.ProgressValue = 0;
+            this.pbBGWork.Size = new System.Drawing.Size(1030, 1);
+            this.pbBGWork.TabIndex = 3;
             // 
             // chbtn_Settings
             // 
@@ -195,136 +331,6 @@
             this.btnTechSupp.UseVisualStyleBackColor = false;
             this.btnTechSupp.Click += new System.EventHandler(this.btnTechSupp_Click);
             // 
-            // pnlHeader
-            // 
-            this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(53)))), ((int)(((byte)(65)))));
-            this.pnlHeader.Controls.Add(this.lblLastUpdate);
-            this.pnlHeader.Controls.Add(this.lblCaption);
-            this.pnlHeader.Controls.Add(this.btnUpdate);
-            this.pnlHeader.Controls.Add(this.btnClose);
-            this.pnlHeader.Controls.Add(this.pbBGWork);
-            this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlHeader.Location = new System.Drawing.Point(4, 0);
-            this.pnlHeader.Name = "pnlHeader";
-            this.pnlHeader.Size = new System.Drawing.Size(1030, 50);
-            this.pnlHeader.TabIndex = 0;
-            this.pnlHeader.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pnlHeader_MouseDoubleClick);
-            this.pnlHeader.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panel3_MouseDown);
-            // 
-            // lblLastUpdate
-            // 
-            this.lblLastUpdate.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.lblLastUpdate.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblLastUpdate.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(88)))), ((int)(((byte)(86)))));
-            this.lblLastUpdate.Location = new System.Drawing.Point(537, 12);
-            this.lblLastUpdate.Name = "lblLastUpdate";
-            this.lblLastUpdate.Size = new System.Drawing.Size(400, 24);
-            this.lblLastUpdate.TabIndex = 4;
-            this.lblLastUpdate.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // lblCaption
-            // 
-            this.lblCaption.AutoSize = true;
-            this.lblCaption.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblCaption.ForeColor = System.Drawing.Color.White;
-            this.lblCaption.Location = new System.Drawing.Point(65, 17);
-            this.lblCaption.Name = "lblCaption";
-            this.lblCaption.Size = new System.Drawing.Size(0, 16);
-            this.lblCaption.TabIndex = 1;
-            // 
-            // btnUpdate
-            // 
-            this.btnUpdate.FlatAppearance.BorderSize = 0;
-            this.btnUpdate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnUpdate.Location = new System.Drawing.Point(12, 12);
-            this.btnUpdate.Name = "btnUpdate";
-            this.btnUpdate.Size = new System.Drawing.Size(25, 25);
-            this.btnUpdate.TabIndex = 2;
-            this.btnUpdate.UseVisualStyleBackColor = true;
-            this.btnUpdate.Click += new System.EventHandler(this.btnUpdate_Click);
-            // 
-            // btnClose
-            // 
-            this.btnClose.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(53)))), ((int)(((byte)(65)))));
-            this.btnClose.Dock = System.Windows.Forms.DockStyle.Right;
-            this.btnClose.FlatAppearance.BorderSize = 0;
-            this.btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnClose.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnClose.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(88)))), ((int)(((byte)(86)))));
-            this.btnClose.Location = new System.Drawing.Point(943, 0);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(87, 49);
-            this.btnClose.TabIndex = 1;
-            this.btnClose.Text = "CLOSE";
-            this.btnClose.UseVisualStyleBackColor = false;
-            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
-            // 
-            // pbBGWork
-            // 
-            this.pbBGWork.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pbBGWork.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.pbBGWork.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(88)))), ((int)(((byte)(86)))));
-            this.pbBGWork.Location = new System.Drawing.Point(0, 49);
-            this.pbBGWork.Margin = new System.Windows.Forms.Padding(11, 9, 11, 9);
-            this.pbBGWork.Name = "pbBGWork";
-            this.pbBGWork.ProgressColor = System.Drawing.Color.Gainsboro;
-            this.pbBGWork.ProgressText = "";
-            this.pbBGWork.ProgressValue = 0;
-            this.pbBGWork.Size = new System.Drawing.Size(1030, 1);
-            this.pbBGWork.TabIndex = 3;
-            // 
-            // pnlDashboard
-            // 
-            this.pnlDashboard.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(53)))), ((int)(((byte)(65)))));
-            this.pnlDashboard.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlDashboard.Location = new System.Drawing.Point(4, 50);
-            this.pnlDashboard.Name = "pnlDashboard";
-            this.pnlDashboard.Size = new System.Drawing.Size(1030, 622);
-            this.pnlDashboard.TabIndex = 2;
-            // 
-            // pnlVertDivider
-            // 
-            this.pnlVertDivider.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(21)))), ((int)(((byte)(33)))), ((int)(((byte)(45)))));
-            this.pnlVertDivider.Dock = System.Windows.Forms.DockStyle.Left;
-            this.pnlVertDivider.Location = new System.Drawing.Point(0, 0);
-            this.pnlVertDivider.Name = "pnlVertDivider";
-            this.pnlVertDivider.Size = new System.Drawing.Size(4, 672);
-            this.pnlVertDivider.TabIndex = 3;
-            // 
-            // pnlLayoutRight
-            // 
-            this.pnlLayoutRight.Controls.Add(this.pnlHorizDivider);
-            this.pnlLayoutRight.Controls.Add(this.pnlDashboard);
-            this.pnlLayoutRight.Controls.Add(this.pnlHeader);
-            this.pnlLayoutRight.Controls.Add(this.pnlVertDivider);
-            this.pnlLayoutRight.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlLayoutRight.Location = new System.Drawing.Point(200, 0);
-            this.pnlLayoutRight.Name = "pnlLayoutRight";
-            this.pnlLayoutRight.Size = new System.Drawing.Size(1034, 672);
-            this.pnlLayoutRight.TabIndex = 4;
-            // 
-            // pnlHorizDivider
-            // 
-            this.pnlHorizDivider.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(21)))), ((int)(((byte)(33)))), ((int)(((byte)(45)))));
-            this.pnlHorizDivider.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlHorizDivider.Location = new System.Drawing.Point(4, 50);
-            this.pnlHorizDivider.Name = "pnlHorizDivider";
-            this.pnlHorizDivider.Size = new System.Drawing.Size(1030, 4);
-            this.pnlHorizDivider.TabIndex = 4;
-            // 
-            // bgWorker
-            // 
-            this.bgWorker.WorkerReportsProgress = true;
-            this.bgWorker.WorkerSupportsCancellation = true;
-            this.bgWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgWorker_DoWork);
-            this.bgWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bgWorker_ProgressChanged);
-            this.bgWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgWorker_RunWorkerCompleted);
-            // 
-            // timer
-            // 
-            this.timer.Interval = 300000;
-            this.timer.Tick += new System.EventHandler(this.timer_Tick);
-            // 
             // Dashboard
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -367,7 +373,8 @@
         private CheckedButton chbtn_Settings;
         private customProgressBar pbBGWork;
         private System.ComponentModel.BackgroundWorker bgWorker;
-        private System.Windows.Forms.Timer timer;
+        private System.Windows.Forms.Timer tmrUpdate;
         private System.Windows.Forms.Label lblLastUpdate;
+        private System.Windows.Forms.Timer tmrSlideShow;
     }
 }

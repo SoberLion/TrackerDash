@@ -17,6 +17,8 @@ namespace TrackerHelper
     {
         delegate void Message(string message);
 
+        private int SlideCounter = 0;
+
         DashboardPreset activePreset { get; set; }
 
         private List<IDashboardControlsUpdate> _dashboardList = new List<IDashboardControlsUpdate>();
@@ -45,14 +47,10 @@ namespace TrackerHelper
         {
            InitializeComponent();
            GetActivePreset();
-            /*   IntPtr ptr = CreateRoundRectRgn(0, 0, this.Width, this.Height, 25, 25); // _BoarderRaduis can be adjusted to your needs, try 15 to start.
-              this.Region = Region.FromHrgn(ptr);
-              DeleteObject(ptr);
-
-              IntPtr pnlptr = CreateRoundRectRgn(0, 0, pnlLogo.Width, pnlLogo.Height, 25, 25); // _BoarderRaduis can be adjusted to your needs, try 15 to start.
-              pnlLogo.Region = Region.FromHrgn(pnlptr);
-              DeleteObject(pnlptr);*/
-
+            CreateDashboards();
+         /*   IntPtr ptr = CreateRoundRectRgn(0, 0, this.Width, this.Height, 25, 25);
+            this.Region = Region.FromHrgn(ptr);
+            DeleteObject(ptr);*/
         }
 
         private void GetActivePreset()
@@ -174,8 +172,8 @@ namespace TrackerHelper
         private void Dashboard_Load(object sender, EventArgs e)
         {
             DBman.CreateDatabase();
-            timer.Enabled = true;
-            timer.Interval = 300000/100;
+            tmrUpdate.Enabled = true;
+            tmrUpdate.Interval = 300000/100;
             pbBGWork.ProgressValue = 100;
         }
 
@@ -184,7 +182,7 @@ namespace TrackerHelper
             pbBGWork.ProgressValue -= 1;
             if (pbBGWork.ProgressValue == 0)
             {
-                timer.Enabled = false;
+                tmrUpdate.Enabled = false;
                 if (bgWorker.IsBusy != true)
                 {
                     bgWorker.RunWorkerAsync();
@@ -220,7 +218,7 @@ namespace TrackerHelper
         {
             if ((e.Cancelled == true))
             {
-                timer.Enabled = true;
+                tmrUpdate.Enabled = true;
             }
             else if (!(e.Error == null))
             {
@@ -229,7 +227,7 @@ namespace TrackerHelper
             {
                 pbBGWork.ProgressValue = 100;
                 SetLblLastUpdateText("Last update: " + DateTime.Now.ToString("HH:mm:dd"));
-                timer.Enabled = true;
+                tmrUpdate.Enabled = true;
             }
         }
 
@@ -240,12 +238,13 @@ namespace TrackerHelper
             _dashboardList.Add(getIssuesStatus(9));
             _dashboardList.Add(getIssuesStatus(18));
             _dashboardList.Add(getIssuesStatus(22));
+            tmrSlideShow.Enabled = true;
         }
 
         public IDashboardControlsUpdate getIssuesStatus(int statusId)
         {
             GetActivePreset();
-            DashboardIssuesStatus dash = Controls.Find(Name, true).FirstOrDefault() as DashboardIssuesStatus;
+            DashboardIssuesStatus dash = Controls.Find(activePreset.Statuses.Find(s => s.ID == statusId).Name, true).FirstOrDefault() as DashboardIssuesStatus;
             if (dash != null)
             {
                 //return dash;
@@ -307,11 +306,17 @@ namespace TrackerHelper
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
-            timer.Enabled = false;
+            tmrUpdate.Enabled = false;
             if (bgWorker.IsBusy != true)
             {
                 bgWorker.RunWorkerAsync();
             }
+        }
+
+        private void tmrSlideShow_Tick(object sender, EventArgs e)
+        {
+            _dashboardList[SlideCounter % _dashboardList.Count].ControlUpdate();
+            SlideCounter++; 
         }
     }
 }

@@ -185,7 +185,8 @@ namespace TrackerHelper.Controls
                 Dock = DockStyle.Top,
                 Name = "pnl" + status.ID.ToString(),
                 Height = 40,
-                Margin = new Padding(3, 3, 3, 3)
+                Margin = new Padding(3, 3, 3, 3),
+                Padding = new Padding(5, 0, 0, 0)
             };
             TextBox tb = new TextBox
             {
@@ -202,7 +203,8 @@ namespace TrackerHelper.Controls
                 Dock = DockStyle.Top,
                 Text = status.Name,
                 ForeColor = System.Drawing.Color.Gainsboro,
-                TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+                TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
+                Font = new System.Drawing.Font(Label.DefaultFont.FontFamily, 9, System.Drawing.FontStyle.Bold)
             };
         }
         private void DisposeStatusHoursTextBox(Status status)
@@ -232,5 +234,6 @@ namespace TrackerHelper.Controls
         {
 
         }
+
     }
 }
