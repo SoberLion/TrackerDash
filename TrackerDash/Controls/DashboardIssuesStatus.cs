@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Data;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using TrackerHelper.DB;
 
@@ -69,53 +65,52 @@ namespace TrackerHelper.Controls
 
         public void GetDataTable()
         {
-            if (HoursToOverdue != 0)
+
+            dgvIssuesStatus.DataSource = CheckStatusOverdue(10, 20, HoursToOverdue);
+
+            dgvIssuesStatus.ClearSelection();
+            dgvIssuesStatus.BackgroundColor = Color.FromArgb(43, 51, 65);
+
+            dgvIssuesStatus.AllowUserToOrderColumns = true;
+            dgvIssuesStatus.SelectionMode = DataGridViewSelectionMode.CellSelect;
+            dgvIssuesStatus.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            dgvIssuesStatus.AllowUserToResizeColumns = false;
+            dgvIssuesStatus.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvIssuesStatus.AllowUserToResizeRows = false;
+            dgvIssuesStatus.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+
+            dgvIssuesStatus.DefaultCellStyle.SelectionBackColor = Color.Transparent;
+
+            // dgvIssuesStatus.RowsDefaultCellStyle.BackColor = Color.FromArgb(43, 51, 65);
+            dgvIssuesStatus.AlternatingRowsDefaultCellStyle.BackColor = Color.Gainsboro;//.FromArgb(23, 31, 45);
+
+            //  dgvIssuesStatus.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
+            //   dgvIssuesStatus.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(43, 51, 65);
+            //    dgvIssuesStatus.RowHeadersDefaultCellStyle.BackColor = Color.Black;
+
+            // dgvIssuesStatus.ForeColor = Color.Gainsboro;
+
+            dgvIssuesStatus.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            dgvIssuesStatus.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            dgvIssuesStatus.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            dgvIssuesStatus.Columns[3].DefaultCellStyle.WrapMode = DataGridViewTriState.True;
+            dgvIssuesStatus.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+            using (Font font = new Font(dgvIssuesStatus.DefaultCellStyle.Font.FontFamily, 14, FontStyle.Bold))
             {
-                dgvIssuesStatus.DataSource = CheckStatusOverdue(10, 20, HoursToOverdue);
+                dgvIssuesStatus.Columns[1].DefaultCellStyle.Font = font;
+                dgvIssuesStatus.Columns[2].DefaultCellStyle.Font = font;
+                dgvIssuesStatus.Columns[3].DefaultCellStyle.Font = font;
 
-                dgvIssuesStatus.ClearSelection();
-                dgvIssuesStatus.BackgroundColor = Color.FromArgb(43, 51, 65);
-
-                dgvIssuesStatus.AllowUserToOrderColumns = true;
-                dgvIssuesStatus.SelectionMode = DataGridViewSelectionMode.CellSelect;
-                dgvIssuesStatus.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-                dgvIssuesStatus.AllowUserToResizeColumns = false;
-                dgvIssuesStatus.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-                dgvIssuesStatus.AllowUserToResizeRows = false;
-                dgvIssuesStatus.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-
-                dgvIssuesStatus.DefaultCellStyle.SelectionBackColor = Color.Transparent;
-
-                dgvIssuesStatus.RowsDefaultCellStyle.BackColor = Color.FromArgb(43, 51, 65);
-                dgvIssuesStatus.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(23, 31, 45);
-
-                dgvIssuesStatus.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
-                dgvIssuesStatus.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(43, 51, 65);
-                dgvIssuesStatus.RowHeadersDefaultCellStyle.BackColor = Color.Black;
-
-                dgvIssuesStatus.ForeColor = Color.Gainsboro;
-
-                dgvIssuesStatus.Columns["Номер задачи"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-                dgvIssuesStatus.Columns["Создан"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-                dgvIssuesStatus.Columns["Назначена"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-                dgvIssuesStatus.Columns["Тема"].DefaultCellStyle.WrapMode = DataGridViewTriState.True;
-                dgvIssuesStatus.Columns["Тема"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-
-                using (Font font = new Font(dgvIssuesStatus.DefaultCellStyle.Font.FontFamily, 14, FontStyle.Bold))
-                {
-                    dgvIssuesStatus.Columns["Создан"].DefaultCellStyle.Font = font;
-                    dgvIssuesStatus.Columns["Тема"].DefaultCellStyle.Font = font;
-                    dgvIssuesStatus.Columns["Номер задачи"].DefaultCellStyle.Font = font;
-                    dgvIssuesStatus.Columns["Назначена"].DefaultCellStyle.Font = font;
-                    dgvIssuesStatus.ColumnHeadersDefaultCellStyle.Font = font;
-                }
-                pnlSplash.Visible = false;
+                dgvIssuesStatus.ColumnHeadersDefaultCellStyle.Font = font;
             }
-            else
+            using (Font font = new Font(dgvIssuesStatus.DefaultCellStyle.Font.FontFamily, 18, FontStyle.Bold))
             {
-                pnlSplash.Visible = true;
-                lblLoading.Text = "SLA не указан для данного статуса.";
+                dgvIssuesStatus.Columns[0].DefaultCellStyle.Font = font;
+                dgvIssuesStatus.Columns[0].DefaultCellStyle.ForeColor = Color.Red;
             }
+            pnlSplash.Visible = false;
+
         }
 
 
@@ -128,19 +123,36 @@ namespace TrackerHelper.Controls
 
             overdue = DateTime.Now.AddHours(-GetHours(hoursFrom, hoursTo, hoursToOverdue)).ToString(_dateFormat);
 
-            string query = $@"SELECT iss.issueid AS 'Номер задачи'
-                            , strftime('%Y-%m-%d %H:%M',iss.CreatedOn) AS 'Создан'
-                            , iss.AssignedToName AS 'Назначена'
-                            , iss.Subject AS 'Тема'
-                            FROM Issues iss 
-                            WHERE issueId IN
-	                            (SELECT IssueId FROM Journals WHERE CreatedOn < '{overdue}' AND id IN
-		                            (SELECT JournalId FROM JournalDetails WHERE newValue IN ({ArrayToString(StatusIdList)})))
+            string query;
+            if (StatusIdList[0] != 1)
+            {
+                query = $@"SELECT issueid AS '№'
+                          , StatusName AS 'Статус'
+                          , AssignedToName AS 'Назначена'
+                          , Subject AS 'Тема'
+                          FROM Issues 
+                          WHERE issueId IN
+	                          (SELECT IssueId FROM Journals WHERE CreatedOn < '{overdue}' AND id IN
+		                          (SELECT JournalId FROM JournalDetails WHERE newValue IN ({ArrayToString(StatusIdList)})))
+                          AND StatusId IN ({ArrayToString(StatusIdList)})
+                          AND AssignedToId IN ({ArrayToString(UserIdList)})
+                          AND ProjectId IN ({ArrayToString(ProjectIdArray)})
+                          GROUP BY AssignedToName, IssueId
+                          ORDER BY AssignedToName";
+            }
+            else
+            {
+                query = $@"SELECT issueid AS '№'
+                          , strftime('%Y-%m-%d %H:%M', CreatedOn) AS 'Создан'
+                          , AssignedToName AS 'Назначена'
+                          , Subject AS 'Тема'
+                            FROM Issues
+                            WHERE CreatedOn < '{overdue}'
                             AND StatusId IN ({ArrayToString(StatusIdList)})
                             AND AssignedToId IN ({ArrayToString(UserIdList)})
                             AND ProjectId IN ({ArrayToString(ProjectIdArray)})
-                            GROUP BY AssignedToName, IssueId
                             ORDER BY AssignedToName";
+            }
 
             // joins way too long  :(
             /* 

@@ -318,8 +318,10 @@ namespace TrackerHelper
 
         private void tmrSlideShow_Tick(object sender, EventArgs e)
         {
+            tmrSlideShow.Enabled = false;
             _dashboardList[SlideCounter % _dashboardList.Count].ControlUpdate();
-            SlideCounter++; 
+            SlideCounter++;
+            tmrSlideShow.Enabled = true;
         }
 
         private void btnSlideshow_CheckedChange(object sender, EventArgs e)
