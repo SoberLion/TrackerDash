@@ -3,7 +3,7 @@ using System.Xml.Serialization;
 
 namespace TrackerHelper.RedmineEntities
 {
-    public class IdName
+    public class IdName : IComparer<IdName>, System.IComparable<IdName>
     {
         public IdName() { }
 
@@ -21,6 +21,21 @@ namespace TrackerHelper.RedmineEntities
         {
             get { return nameField; }
             set { nameField = value; }
+        }
+
+        public int Compare(IdName x, IdName y)
+        {
+            int i = 0;
+            if (x.id > y.id)
+                i = 1;
+            if (x.id < y.id)
+                i = -1;
+            return i;
+        }
+
+        public int CompareTo(IdName other)
+        {
+            return Compare(this, other);
         }
     }
 

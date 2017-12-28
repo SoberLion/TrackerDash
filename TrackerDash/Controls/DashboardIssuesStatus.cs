@@ -172,7 +172,7 @@ namespace TrackerHelper.Controls
              */
             return DBman.OpenQuery(query);
         }
-
+        //TODO Think about this method again
         public int GetHours(int hoursFrom, int hoursTo, int hoursToOverdue)
         {
             int hours = hoursToOverdue;

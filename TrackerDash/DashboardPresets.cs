@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TrackerHelper.RedmineEntities;
 using System.ComponentModel;
 
 namespace TrackerHelper
 {
-    public class Status : INotifyPropertyChanged
+    public class Status : INotifyPropertyChanged, IComparer<Status>, IComparable<Status>
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -33,7 +34,23 @@ namespace TrackerHelper
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("MaxHours"));
                 }
             }
-        }        
+        }
+
+        public int Compare(Status x, Status y)
+        {
+            int i = 0;
+            if (x.ID > y.ID)
+                i = 1;
+            else if (x.ID < y.ID)
+                i = -1;
+
+            return i;
+        }
+
+        public int CompareTo(Status other)
+        {
+          return Compare(this, other);
+        }
     }
     public class StatusComparer : IEqualityComparer<Status>
     {

@@ -232,8 +232,109 @@ namespace TrackerHelper.Controls
 
         private void tbStatusFilter_TextChanged(object sender, EventArgs e)
         {
+            TextBox tb = sender as TextBox;
+            List<Status> statusListChecked = new List<Status>();
+            List<Status> statusListUnchecked = new List<Status>();
 
+            string Statuses = "SELECT DISTINCT StatusId, StatusName FROM Issues ORDER BY StatusId";
+
+            DataRow[] StatusData = DBman.OpenQuery(Statuses).Select("");
+            List<Status> statList = StatusData.Select(p => new Status { ID = Convert.ToInt32(p[0]), Name = p[1].ToString() })
+                .Except(Preset.Statuses, new StatusComparer()).ToList();
+
+            if (tb.Text.Length > 2)
+            {
+                statusListChecked = Preset.Statuses.Where(s => s.Name.ToUpper().Contains(tb.Text.ToUpper())).OrderBy(t => t).ToList();
+                statusListUnchecked = statList.Where(s => s.Name.ToUpper().Contains(tb.Text.ToUpper())).OrderBy(t => t).ToList();
+            }
+            else if (tb.Text == string.Empty)
+            {
+                
+                statusListChecked = Preset.Statuses;
+                statusListUnchecked = statList;
+            }
+            clbStatus.Items.Clear();
+            for (int i = 0; i < statusListChecked.Count; i++)
+            {
+                clbStatus.Items.Add($"{statusListChecked[i].Name} <{statusListChecked[i].ID}>", true);                
+            }
+            for (int i = 0; i < statusListUnchecked.Count; i++)
+            {
+                clbStatus.Items.Add($"{statusListUnchecked[i].Name} <{statusListUnchecked[i].ID}>", false);
+            }
         }
 
+        private void tbProjFilter_TextChanged(object sender, EventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            List<IdName> projectsListChecked = new List<IdName>();
+            List<IdName> projectsListUnchecked = new List<IdName>();
+
+            string projects = "SELECT DISTINCT ProjectId, ProjectName FROM Issues ORDER BY ProjectName";
+
+            DataRow[] projectsData = DBman.OpenQuery(projects).Select("");
+            List<IdName> projList = projectsData.Select(p => new IdName { id = Convert.ToInt32(p[0]), name = p[1].ToString() })
+                .Except(Preset.Projects, new IdNameComparer()).ToList();
+
+            if (tb.Text.Length > 2)
+            {
+
+                projectsListChecked = Preset.Projects.Where(s => s.name.ToUpper().Contains(tb.Text.ToUpper())).OrderBy(t => t).ToList();
+                projectsListUnchecked = projList.Where(s => s.name.Contains(tb.Text)).OrderBy(t => t).ToList();
+ 
+            }
+            else if (tb.Text == string.Empty)
+            {
+                projectsListChecked = Preset.Projects;
+                projectsListUnchecked = projList;
+            }
+            clbProjects.Items.Clear();
+            for (int i = 0; i < projectsListChecked.Count; i++)
+            {
+                clbProjects.Items.Add($"{projectsListChecked[i].name} <{projectsListChecked[i].id}>", true);
+            }
+            for (int i = 0; i < projectsListUnchecked.Count; i++)
+            {
+                clbProjects.Items.Add($"{projectsListUnchecked[i].name} <{projectsListUnchecked[i].id}>", false);
+            }
+        }
+
+        private void tbEmplFilter_TextChanged(object sender, EventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            List<IdName> employeesListChecked = new List<IdName>();
+            List<IdName> employeesListUnchecked = new List<IdName>();
+
+            string Employees = @"SELECT ID, (Lastname || ' ' || FirstName) as Name
+                                FROM Users
+                                WHERE CompanyName in ('Компания UCS', 'UCS-Москва')
+                                ORDER BY Name";
+
+            DataRow[] employeesData = DBman.OpenQuery(Employees).Select("");
+            List<IdName> emplList = employeesData.Select(p => new IdName { id = Convert.ToInt32(p[0]), name = p[1].ToString() })
+                .Except(Preset.Employees, new IdNameComparer()).ToList();
+
+            if (tb.Text.Length > 2)
+            {
+
+                employeesListChecked = Preset.Employees.Where(s => s.name.ToUpper().Contains(tb.Text.ToUpper())).OrderBy(t => t).ToList();
+                employeesListUnchecked = emplList.Where(s => s.name.ToUpper().Contains(tb.Text.ToUpper())).OrderBy(t => t).ToList();
+
+            }
+            else if (tb.Text == string.Empty)
+            {
+                employeesListChecked = Preset.Employees;
+                employeesListUnchecked = emplList;
+            }
+            clbEmployees.Items.Clear();
+            for (int i = 0; i < employeesListChecked.Count; i++)
+            {
+                clbEmployees.Items.Add($"{employeesListChecked[i].name} <{employeesListChecked[i].id}>", true);
+            }
+            for (int i = 0; i < employeesListUnchecked.Count; i++)
+            {
+                clbEmployees.Items.Add($"{employeesListUnchecked[i].name} <{employeesListUnchecked[i].id}>", false);
+            }
+        }
     }
 }
