@@ -228,8 +228,13 @@ namespace TrackerHelper.Controls
         }
         private void tbKeyPress(object sender, KeyPressEventArgs e)
         {
-            if (!int.TryParse((sender as TextBox).Text, out int i) || (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar)))
+            if ((!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar)))
             {
+                e.Handled = true;
+            }
+            if (!int.TryParse((sender as TextBox).Text + e.KeyChar, out int i))
+            {
+                (sender as TextBox).Text = int.MaxValue.ToString();
                 e.Handled = true;
             }
         }
