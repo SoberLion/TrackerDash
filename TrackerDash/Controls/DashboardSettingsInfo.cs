@@ -263,7 +263,6 @@ namespace TrackerHelper.Controls
                 clbStatus.Items.Add($"{statusListUnchecked[i].Name} <{statusListUnchecked[i].ID}>", false);
             }
         }
-
         private void tbProjFilter_TextChanged(object sender, EventArgs e)
         {
             TextBox tb = sender as TextBox;
@@ -298,7 +297,6 @@ namespace TrackerHelper.Controls
                 clbProjects.Items.Add($"{projectsListUnchecked[i].name} <{projectsListUnchecked[i].id}>", false);
             }
         }
-
         private void tbEmplFilter_TextChanged(object sender, EventArgs e)
         {
             TextBox tb = sender as TextBox;

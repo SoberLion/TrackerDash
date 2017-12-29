@@ -173,29 +173,49 @@ namespace TrackerHelper.Controls
             return DBman.OpenQuery(query);
         }
         //TODO Think about this method again
-        public int GetHours(int hoursFrom, int hoursTo, int hoursToOverdue)
+        public int GetHours(int dayStartHour, int dayEndHour, int maxHours)
         {
-            int hours = hoursToOverdue;
-            if (DateTime.Now.DayOfWeek == DayOfWeek.Monday && (DateTime.Now.Hour - hours) < hoursFrom)
-            {
-                hours = 24 * 3 - hoursTo + hoursFrom + hours;
+            DateTime Now = DateTime.Now;
+            int Hours = 0;
+            int workDaysFull = maxHours / Math.Abs(dayEndHour - dayStartHour);
+            int workDayPart = maxHours % Math.Abs(dayEndHour - dayStartHour);
+
+            Hours += workDaysFull * 24;
+
+            if (Now.DayOfWeek == DayOfWeek.Saturday)
+            {// 1 - компенсация за минуты больше указанного часа.
+                Hours += Now.Hour + 1;
             }
-            if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday)
-            {
-                hours = 24 * 2 - hoursTo + hoursFrom + hours;
+            if (Now.DayOfWeek == DayOfWeek.Sunday)
+            {// 1 - 1 - компенсация за минуты больше указанного часа.
+                Hours += 24 + Now.Hour + 1;
             }
-            if (DateTime.Now.DayOfWeek == DayOfWeek.Saturday)
+
+            do
             {
-                hours = 24 - hoursTo + hoursFrom + hours;
+                if (Now.AddHours(-Hours).DayOfWeek == DayOfWeek.Saturday)
+                    Hours += 24;
+                else if (Now.AddHours(-Hours).DayOfWeek == DayOfWeek.Sunday)
+                    Hours += 48;
+
+                if (Now.AddHours(-Hours - workDayPart).Hour < dayStartHour)
+                {
+                    workDayPart = workDayPart - (dayStartHour - Now.AddHours(-Hours).Hour);
+                    Hours += dayStartHour + 24 - dayEndHour + dayStartHour - Now.AddHours(-Hours).Hour;
+                }
+                else if (Now.AddHours(-Hours - workDayPart).Hour > dayEndHour)
+                { // 1 - 1 - компенсация за минуты больше указанного часа.
+                    Hours += Now.AddHours(-Hours - workDayPart).Hour + 1 - dayEndHour;
+                }
+                else
+                {
+                    Hours += workDayPart;
+                    workDayPart = 0;
+                }
             }
-            if ((DateTime.Now.DayOfWeek == DayOfWeek.Tuesday ||
-               DateTime.Now.DayOfWeek == DayOfWeek.Wednesday ||
-               DateTime.Now.DayOfWeek == DayOfWeek.Thursday ||
-               DateTime.Now.DayOfWeek == DayOfWeek.Friday) && ((DateTime.Now.Hour - hours) < hoursFrom))
-            {
-                hours = 24 - hoursTo + hoursFrom + hours;
-            }
-            return hours;
+            while (workDayPart > 0);
+            return Hours;
+            
         }
 
         public void ControlUpdate()

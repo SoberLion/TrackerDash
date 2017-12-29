@@ -63,10 +63,6 @@ namespace TrackerHelper.Controls
         }
         private void TSDashboard_Load(object sender, EventArgs e)
         {
-            // Thread UpdateThread = new Thread(new ThreadStart(UpdateTSDashboard));
-            //UpdateThread.Start(); // запускаем поток
-
-
         }
 
         private void btnUpdateData_Click(object sender, EventArgs e)
