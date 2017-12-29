@@ -197,6 +197,7 @@ namespace TrackerHelper.Controls
             };
             tb.DataBindings.Add("Text", status, "MaxHours", false, DataSourceUpdateMode.OnPropertyChanged);
             tb.TextChanged += new EventHandler(onTextBoxChanged); //onTextBoxChanged;
+            tb.KeyPress += tbKeyPress;
             Label lbl = new Label
             {
                 Parent = pnl,
@@ -225,6 +226,14 @@ namespace TrackerHelper.Controls
                 }
             }
         }
+        private void tbKeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!int.TryParse((sender as TextBox).Text, out int i) || (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar)))
+            {
+                e.Handled = true;
+            }
+        }
+
         private void btnClose_Click(object sender, EventArgs e)
         {
             Dispose();
