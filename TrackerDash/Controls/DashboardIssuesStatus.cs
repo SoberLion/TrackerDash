@@ -177,11 +177,14 @@ namespace TrackerHelper.Controls
         {
             DateTime Now = DateTime.Now;
             int Hours = 0;
+            //Кол-во полных дней
             int workDaysFull = maxHours / Math.Abs(dayEndHour - dayStartHour);
+            //Остаток часов.
             int workDayPart = maxHours % Math.Abs(dayEndHour - dayStartHour);
 
             Hours += workDaysFull * 24;
 
+            //Если текущий день выходной
             if (Now.DayOfWeek == DayOfWeek.Saturday)
             {// 1 - компенсация за минуты больше указанного часа.
                 Hours += Now.Hour + 1;

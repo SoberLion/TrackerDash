@@ -254,21 +254,17 @@ namespace TrackerHelper
                 dash.Dispose();
             }
 
-            if (activePreset.Statuses.Find(s => s.ID == statusId).MaxHours > 0)
+            dash = new DashboardIssuesStatus
             {
-                dash = new DashboardIssuesStatus
-                {
-                    Parent = this.pnlDashboard,
-                    Dock = DockStyle.Fill,
-                    BackColor = Color.FromArgb(41, 53, 65),
-                    Name = activePreset.Statuses.Find(s => s.ID == statusId).Name,
-                    StatusIdList = new int[] { statusId },
-                    HoursToOverdue = activePreset.Statuses.Find(s => s.ID == statusId).MaxHours,
-                    UserIdList = activePreset.Employees.Select(p => p.id).ToArray(),
-                    ProjectIdArray = activePreset.Projects.Select(p => p.id).ToArray()
-                };
-            }
-            else lblCaption.Text = "SLA не указан для данного статуса.";
+                Parent = this.pnlDashboard,
+                Dock = DockStyle.Fill,
+                BackColor = Color.FromArgb(41, 53, 65),
+                Name = activePreset.Statuses.Find(s => s.ID == statusId).Name,
+                StatusIdList = new int[] { statusId },
+                HoursToOverdue = activePreset.Statuses.Find(s => s.ID == statusId).MaxHours,
+                UserIdList = activePreset.Employees.Select(p => p.id).ToArray(),
+                ProjectIdArray = activePreset.Projects.Select(p => p.id).ToArray()
+            };
              
             return dash;
         }
