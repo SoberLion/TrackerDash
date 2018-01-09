@@ -75,12 +75,13 @@ namespace TrackerHelper.Controls
             pnlSplash.Visible = true;
             CartesianChartStackedColumns();
 
-            FilterBtnClick(btnWeek, EventArgs.Empty);
-
             UpdateLblStatusValue(lblStatusNewValue, "1");
             UpdateLblStatusValue(lblStatusAssignedValue, "9");
             UpdateLblStatusValue(lblStatusNeedInfoEmplValue, "18");
             UpdateLblStatusValue(lblStatusEscalatedValue, "22");
+
+            UpdateWeekLabels();
+            UpdateMonthLabels();
 
             CreateUsersButtons();
             tmrSplash.Enabled = true;
@@ -336,11 +337,67 @@ namespace TrackerHelper.Controls
 
         #region  ------------------------------ Week / Month labels -------------------------------
 
+        private void UpdateWeekLabels()
+        {
+            string thisBegin = string.Empty;
+            string thisEnd = string.Empty;
+            string LastBegin = string.Empty;
+            string LastEnd = string.Empty;
+
+            lblWeekThisYearDates.Text = DateTime.Now.AddDays(-7).ToString("dd-MM-yyyy") + " --- " + DateTime.Now.ToString("dd-MM-yyyy");
+            lblWeekLastYearDates.Text = DateTime.Now.AddYears(-1).AddDays(-7).ToString("dd-MM-yyyy") + " --- " + DateTime.Now.AddYears(-1).ToString("dd-MM-yyyy");
+
+            thisBegin = DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd 00:00:00,001");
+            thisEnd = DateTime.Now.ToString(_dateFormat);
+
+            LastBegin = DateTime.Now.AddYears(-1).AddDays(-7).ToString("yyyy-MM-dd 00:00:00,001");
+            LastEnd = DateTime.Now.AddYears(-1).ToString(_dateFormat);
+
+            string thisCreatedQuery = $"SELECT count(*) FROM Issues WHERE CreatedOn >= '{thisBegin}' AND CreatedOn < '{thisEnd}' AND AssignedToId in ({ArrayToString(UserIdList)})";
+            string LastCreatedQuery = $"SELECT count(*) FROM Issues WHERE CreatedOn >= '{LastBegin}' AND CreatedOn < '{LastEnd}' AND AssignedToId in ({ArrayToString(UserIdList)})";
+            string thisClosedQuery = $"SELECT count(*) FROM Issues WHERE ClosedOn >= '{thisBegin}' AND ClosedOn < '{thisEnd}' AND AssignedToId in ({ArrayToString(UserIdList)})";
+            string LastClosedQuery = $"SELECT count(*) FROM Issues WHERE ClosedOn >= '{LastBegin}' AND ClosedOn < '{LastEnd}' AND AssignedToId in ({ArrayToString(UserIdList)})";
+
+            UpdateLabel(lblCreatedWeekThisYearValue, thisCreatedQuery);
+            UpdateLabel(lblClosedWeekThisYearValue, thisClosedQuery);
+            UpdateLabel(lblCreatedWeekLastYearValue, LastCreatedQuery);
+            UpdateLabel(lblClosedWeekLastYearValue, LastClosedQuery);
+        }
+        private void UpdateMonthLabels()
+        {
+            string thisBegin = string.Empty;
+            string thisEnd = string.Empty;
+            string LastBegin = string.Empty;
+            string LastEnd = string.Empty;
+
+            lblMonthThisYearDates.Text = DateTime.Now.ToString("01-MM-yyyy") + " --- " + DateTime.Now.ToString("dd-MM-yyyy");
+            lblMonthLastYearDates.Text = DateTime.Now.AddYears(-1).ToString("01-MM-yyyy") + " --- " + DateTime.Now.AddYears(-1).ToString("dd-MM-yyyy");
+
+            thisBegin = DateTime.Now.ToString("yyyy-MM-01 00:00:00,001");
+            thisEnd = DateTime.Now.ToString(_dateFormat);
+
+            LastBegin = DateTime.Now.AddYears(-1).ToString("yyyy-MM-01 00:00:00,001");
+            LastEnd = DateTime.Now.AddYears(-1).ToString(_dateFormat);
+
+            string thisCreatedQuery = $"SELECT count(*) FROM Issues WHERE CreatedOn >= '{thisBegin}' AND CreatedOn < '{thisEnd}' AND AssignedToId in ({ArrayToString(UserIdList)})";
+            string LastCreatedQuery = $"SELECT count(*) FROM Issues WHERE CreatedOn >= '{LastBegin}' AND CreatedOn < '{LastEnd}' AND AssignedToId in ({ArrayToString(UserIdList)})";
+            string thisClosedQuery = $"SELECT count(*) FROM Issues WHERE ClosedOn >= '{thisBegin}' AND ClosedOn < '{thisEnd}' AND AssignedToId in ({ArrayToString(UserIdList)})";
+            string LastClosedQuery = $"SELECT count(*) FROM Issues WHERE ClosedOn >= '{LastBegin}' AND ClosedOn < '{LastEnd}' AND AssignedToId in ({ArrayToString(UserIdList)})";
+
+            UpdateLabel(lblCreatedMonthThisYearValue, thisCreatedQuery);
+            UpdateLabel(lblClosedMonthThisYearValue, thisClosedQuery);
+            UpdateLabel(lblCreatedMonthLastYearValue, LastCreatedQuery);
+            UpdateLabel(lblClosedMonthLastYearValue, LastClosedQuery);
+
+        }
+        /*
+        
         enum Filter
         {
             Week,
             Month
         }
+         
 
         private void UpdateWeekMonthLabels(Filter filter)
         {
@@ -352,8 +409,8 @@ namespace TrackerHelper.Controls
 
             if (filter == Filter.Week)
             {
-                lblThisYearDates.Text = DateTime.Now.AddDays(-7).ToString("dd-MM-yyyy") + " --- " + DateTime.Now.ToString("dd-MM-yyyy");
-                lblLastYearDates.Text = DateTime.Now.AddYears(-1).AddDays(-7).ToString("dd-MM-yyyy") + " --- " + DateTime.Now.AddYears(-1).ToString("dd-MM-yyyy");
+                lblWeekThisYearDates.Text = DateTime.Now.AddDays(-7).ToString("dd-MM-yyyy") + " --- " + DateTime.Now.ToString("dd-MM-yyyy");
+                lblWeekLastYearDates.Text = DateTime.Now.AddYears(-1).AddDays(-7).ToString("dd-MM-yyyy") + " --- " + DateTime.Now.AddYears(-1).ToString("dd-MM-yyyy");
 
                 thisBegin = DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd 00:00:00,001");
                 thisEnd = DateTime.Now.ToString(_dateFormat);
@@ -363,8 +420,8 @@ namespace TrackerHelper.Controls
             }
             if (filter == Filter.Month)
             {
-                lblThisYearDates.Text = DateTime.Now.ToString("01-MM-yyyy") + " --- " + DateTime.Now.ToString("dd-MM-yyyy");
-                lblLastYearDates.Text = DateTime.Now.AddYears(-1).ToString("01-MM-yyyy") + " --- " + DateTime.Now.AddYears(-1).ToString("dd-MM-yyyy");
+                lblWeekThisYearDates.Text = DateTime.Now.ToString("01-MM-yyyy") + " --- " + DateTime.Now.ToString("dd-MM-yyyy");
+                lblWeekLastYearDates.Text = DateTime.Now.AddYears(-1).ToString("01-MM-yyyy") + " --- " + DateTime.Now.AddYears(-1).ToString("dd-MM-yyyy");
 
                 thisBegin = DateTime.Now.ToString("yyyy-MM-01 00:00:00,001");
                 thisEnd = DateTime.Now.ToString(_dateFormat);
@@ -379,12 +436,13 @@ namespace TrackerHelper.Controls
             string LastClosedQuery = $"SELECT count(*) FROM Issues WHERE ClosedOn >= '{LastBegin}' AND ClosedOn < '{LastEnd}' AND AssignedToId in ({ArrayToString(UserIdList)})";
 
 
-            UpdateLabel(lblCreatedThisYearValue, thisCreatedQuery);
-            UpdateLabel(lblClosedThisYearValue, thisClosedQuery);
-            UpdateLabel(lblCreatedLastYearValue, LastCreatedQuery);
-            UpdateLabel(lblClosedLastYearValue, LastClosedQuery);
+            UpdateLabel(lblCreatedWeekThisYearValue, thisCreatedQuery);
+            UpdateLabel(lblClosedWeekThisYearValue, thisClosedQuery);
+            UpdateLabel(lblCreatedWeekLastYearValue, LastCreatedQuery);
+            UpdateLabel(lblClosedWeekLastYearValue, LastClosedQuery);
 
         }
+        */
         private void UpdateLabel(object label, string query)
         {
             if (label is Label lbl)
@@ -394,7 +452,7 @@ namespace TrackerHelper.Controls
             }
         }
 
-        private void FilterBtnClick(object sender, EventArgs e)
+  /*      private void FilterBtnClick(object sender, EventArgs e)
         {
             if (sender is CheckedButton cb)
             {
@@ -404,12 +462,12 @@ namespace TrackerHelper.Controls
                     UpdateWeekMonthLabels(Filter.Month);
                 BtnFiltersToggle(sender);
             }
-        }
+        }*/
 
         #endregion 
 
 
-        private void BtnFiltersToggle(object sender)
+    /*    private void BtnFiltersToggle(object sender)
         {
             btnWeek.Check = false;
             btnWeek.BackColor = System.Drawing.Color.FromArgb(41, 53, 65);
@@ -418,7 +476,7 @@ namespace TrackerHelper.Controls
 
             (sender as CheckedButton).Check = true;
             (sender as CheckedButton).BackColor = System.Drawing.Color.FromArgb(21, 33, 45);
-        }
+        }*/
 
         private void tmrSplash_Tick(object sender, EventArgs e)
         {
