@@ -126,32 +126,34 @@ namespace TrackerHelper.Controls
             string query;
             if (StatusIdList[0] != 1)
             {
-                query = $@"SELECT issueid AS '№'
-                          , StatusName AS 'Статус'
-                          , AssignedToName AS 'Назначена'
-                          , Subject AS 'Тема'
-                          FROM Issues 
+                query = $@"SELECT i.issueid AS '№'
+                          , i.StatusName AS 'Статус'
+                          ,(u.Lastname || ' ' || u.FirstName) AS 'Назначена'
+                          , i.Subject AS 'Тема'
+                          FROM Issues i
+                          LEFT JOIN Users u ON i.AssignedToId = u.Id
                           WHERE issueId IN
 	                          (SELECT IssueId FROM Journals WHERE CreatedOn < '{overdue}' AND id IN
 		                          (SELECT JournalId FROM JournalDetails WHERE newValue IN ({ArrayToString(StatusIdList)})))
-                          AND StatusId IN ({ArrayToString(StatusIdList)})
-                          AND AssignedToId IN ({ArrayToString(UserIdList)})
-                          AND ProjectId IN ({ArrayToString(ProjectIdArray)})
-                          GROUP BY AssignedToName, IssueId
-                          ORDER BY AssignedToName";
+                          AND i.StatusId IN ({ArrayToString(StatusIdList)})
+                          AND i.AssignedToId IN ({ArrayToString(UserIdList)})
+                          AND i.ProjectId IN ({ArrayToString(ProjectIdArray)})
+                          GROUP BY i.AssignedToName, i.IssueId
+                          ORDER BY u.Lastname";
             }
             else
             {
-                query = $@"SELECT issueid AS '№'
-                          , strftime('%Y-%m-%d %H:%M', CreatedOn) AS 'Создан'
-                          , AssignedToName AS 'Назначена'
-                          , Subject AS 'Тема'
-                            FROM Issues
-                            WHERE CreatedOn < '{overdue}'
-                            AND StatusId IN ({ArrayToString(StatusIdList)})
-                            AND AssignedToId IN ({ArrayToString(UserIdList)})
-                            AND ProjectId IN ({ArrayToString(ProjectIdArray)})
-                            ORDER BY AssignedToName";
+                query = $@"SELECT i.issueid AS '№'
+                          , strftime('%Y-%m-%d %H:%M', i.CreatedOn) AS 'Создан'
+                          , (u.Lastname || ' ' || u.FirstName) AS 'Назначена'
+                          , i.Subject AS 'Тема'
+                            FROM Issues i 
+                            LEFT JOIN Users u ON i.AssignedToId = u.Id
+                            WHERE i.CreatedOn < '{overdue}'
+                            AND i.StatusId IN ({ArrayToString(StatusIdList)})
+                            AND i.AssignedToId IN ({ArrayToString(UserIdList)})
+                            AND i.ProjectId IN ({ArrayToString(ProjectIdArray)})
+                            ORDER BY u.Lastname";
             }
 
             // joins way too long  :(
