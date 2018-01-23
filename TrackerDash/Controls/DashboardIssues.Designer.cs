@@ -55,8 +55,6 @@
             this.lblClosedWeekThisYear = new System.Windows.Forms.Label();
             this.lblCreatedWeekThisYearValue = new System.Windows.Forms.Label();
             this.lblCreatedWeekThisYear = new System.Windows.Forms.Label();
-            this.pnlBotRightCorner = new System.Windows.Forms.Panel();
-            this.btnUpdateData = new System.Windows.Forms.Button();
             this.lblWeekThisYearDates = new System.Windows.Forms.Label();
             this.lblStatusAssigned = new System.Windows.Forms.Label();
             this.pnlLayoutMid = new System.Windows.Forms.Panel();
@@ -85,7 +83,6 @@
             this.pnlMonthThisYear.SuspendLayout();
             this.pnlWeekLastYear.SuspendLayout();
             this.pnlWeekThisYear.SuspendLayout();
-            this.pnlBotRightCorner.SuspendLayout();
             this.pnlLayoutMid.SuspendLayout();
             this.pnlStatusNeedInfoEmpl.SuspendLayout();
             this.pnlStatusEscalated.SuspendLayout();
@@ -128,7 +125,6 @@
             this.pnlLayoutBot.Controls.Add(this.lblWeekLastYearDates);
             this.pnlLayoutBot.Controls.Add(this.pnlWeekLastYear);
             this.pnlLayoutBot.Controls.Add(this.pnlWeekThisYear);
-            this.pnlLayoutBot.Controls.Add(this.pnlBotRightCorner);
             this.pnlLayoutBot.Controls.Add(this.lblWeekThisYearDates);
             this.pnlLayoutBot.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pnlLayoutBot.Location = new System.Drawing.Point(0, 879);
@@ -425,34 +421,6 @@
             this.lblCreatedWeekThisYear.TabIndex = 10;
             this.lblCreatedWeekThisYear.Text = "Создано:";
             // 
-            // pnlBotRightCorner
-            // 
-            this.pnlBotRightCorner.Controls.Add(this.btnUpdateData);
-            this.pnlBotRightCorner.Dock = System.Windows.Forms.DockStyle.Right;
-            this.pnlBotRightCorner.Location = new System.Drawing.Point(1566, 0);
-            this.pnlBotRightCorner.Name = "pnlBotRightCorner";
-            this.pnlBotRightCorner.Size = new System.Drawing.Size(150, 147);
-            this.pnlBotRightCorner.TabIndex = 7;
-            // 
-            // btnUpdateData
-            // 
-            this.btnUpdateData.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(53)))), ((int)(((byte)(65)))));
-            this.btnUpdateData.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.btnUpdateData.FlatAppearance.BorderSize = 0;
-            this.btnUpdateData.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(184)))), ((int)(((byte)(92)))));
-            this.btnUpdateData.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(21)))), ((int)(((byte)(33)))), ((int)(((byte)(45)))));
-            this.btnUpdateData.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnUpdateData.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
-            this.btnUpdateData.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(88)))), ((int)(((byte)(86)))));
-            this.btnUpdateData.Location = new System.Drawing.Point(0, 74);
-            this.btnUpdateData.Name = "btnUpdateData";
-            this.btnUpdateData.Size = new System.Drawing.Size(150, 73);
-            this.btnUpdateData.TabIndex = 1;
-            this.btnUpdateData.Text = "   UPDATE";
-            this.btnUpdateData.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnUpdateData.UseVisualStyleBackColor = false;
-            this.btnUpdateData.Click += new System.EventHandler(this.btnUpdateData_Click);
-            // 
             // lblWeekThisYearDates
             // 
             this.lblWeekThisYearDates.AutoSize = true;
@@ -712,7 +680,6 @@
             this.Controls.Add(this.pnlLayoutBot);
             this.Name = "DashboardIssues";
             this.Size = new System.Drawing.Size(1716, 1026);
-            this.Load += new System.EventHandler(this.TSDashboard_Load);
             this.pnlSplash.ResumeLayout(false);
             this.pnlSplash.PerformLayout();
             this.pnlLayoutBot.ResumeLayout(false);
@@ -725,7 +692,6 @@
             this.pnlWeekLastYear.PerformLayout();
             this.pnlWeekThisYear.ResumeLayout(false);
             this.pnlWeekThisYear.PerformLayout();
-            this.pnlBotRightCorner.ResumeLayout(false);
             this.pnlLayoutMid.ResumeLayout(false);
             this.pnlLayoutMid.PerformLayout();
             this.pnlStatusNeedInfoEmpl.ResumeLayout(false);
@@ -750,8 +716,6 @@
         private System.Windows.Forms.Panel pnlLayoutTop;
         private System.Windows.Forms.Panel pnlCartesianChart;
         public LiveCharts.WinForms.CartesianChart cartesianChart;
-        private System.Windows.Forms.Panel pnlBotRightCorner;
-        private System.Windows.Forms.Button btnUpdateData;
         private System.Windows.Forms.Panel pnlTopRight;
         private System.Windows.Forms.Panel pnlHorizDividerBot;
         private System.Windows.Forms.Label lblStatusNew;

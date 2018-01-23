@@ -237,27 +237,33 @@
             // 
             // tbStatusFilter
             // 
+            this.tbStatusFilter.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.tbStatusFilter.Location = new System.Drawing.Point(615, 5);
             this.tbStatusFilter.Name = "tbStatusFilter";
-            this.tbStatusFilter.Size = new System.Drawing.Size(270, 20);
+            this.tbStatusFilter.Size = new System.Drawing.Size(270, 13);
             this.tbStatusFilter.TabIndex = 2;
             this.tbStatusFilter.TextChanged += new System.EventHandler(this.tbStatusFilter_TextChanged);
+            this.tbStatusFilter.Enter += new System.EventHandler(this.tbStatusFilter_Enter);
             // 
             // tbProjFilter
             // 
+            this.tbProjFilter.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.tbProjFilter.Location = new System.Drawing.Point(315, 5);
             this.tbProjFilter.Name = "tbProjFilter";
-            this.tbProjFilter.Size = new System.Drawing.Size(270, 20);
+            this.tbProjFilter.Size = new System.Drawing.Size(270, 13);
             this.tbProjFilter.TabIndex = 1;
             this.tbProjFilter.TextChanged += new System.EventHandler(this.tbProjFilter_TextChanged);
+            this.tbProjFilter.Enter += new System.EventHandler(this.tbProjFilter_Enter);
             // 
             // tbEmplFilter
             // 
+            this.tbEmplFilter.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.tbEmplFilter.Location = new System.Drawing.Point(15, 5);
             this.tbEmplFilter.Name = "tbEmplFilter";
-            this.tbEmplFilter.Size = new System.Drawing.Size(270, 20);
+            this.tbEmplFilter.Size = new System.Drawing.Size(270, 13);
             this.tbEmplFilter.TabIndex = 0;
             this.tbEmplFilter.TextChanged += new System.EventHandler(this.tbEmplFilter_TextChanged);
+            this.tbEmplFilter.Enter += new System.EventHandler(this.tbEmplFilter_Enter);
             // 
             // DashboardSettingsInfo
             // 

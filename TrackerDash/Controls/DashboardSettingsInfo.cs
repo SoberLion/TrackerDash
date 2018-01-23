@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using TrackerHelper.DB;
@@ -261,7 +262,7 @@ namespace TrackerHelper.Controls
                 statusListChecked = Preset.Statuses.Where(s => s.Name.ToUpper().Contains(tb.Text.ToUpper())).OrderBy(t => t).ToList();
                 statusListUnchecked = statList.Where(s => s.Name.ToUpper().Contains(tb.Text.ToUpper())).OrderBy(t => t).ToList();
             }
-            else if (tb.Text == string.Empty)
+            else if (tb.Text.Length == 0)
             {
                 
                 statusListChecked = Preset.Statuses;
@@ -293,10 +294,10 @@ namespace TrackerHelper.Controls
             {
 
                 projectsListChecked = Preset.Projects.Where(s => s.name.ToUpper().Contains(tb.Text.ToUpper())).OrderBy(t => t).ToList();
-                projectsListUnchecked = projList.Where(s => s.name.Contains(tb.Text)).OrderBy(t => t).ToList();
+                projectsListUnchecked = projList.Where(s => s.name.ToUpper().Contains(tb.Text.ToUpper())).OrderBy(t => t).ToList();
  
             }
-            else if (tb.Text == string.Empty)
+            else if (tb.Text.Length == 0)
             {
                 projectsListChecked = Preset.Projects;
                 projectsListUnchecked = projList;
@@ -333,7 +334,7 @@ namespace TrackerHelper.Controls
                 employeesListUnchecked = emplList.Where(s => s.name.ToUpper().Contains(tb.Text.ToUpper())).OrderBy(t => t).ToList();
 
             }
-            else if (tb.Text == string.Empty)
+            else if (tb.Text.Length == 0)
             {
                 employeesListChecked = Preset.Employees;
                 employeesListUnchecked = emplList;
@@ -347,6 +348,24 @@ namespace TrackerHelper.Controls
             {
                 clbEmployees.Items.Add($"{employeesListUnchecked[i].name} <{employeesListUnchecked[i].id}>", false);
             }
+        }
+
+        private void tbEmplFilter_Enter(object sender, EventArgs e)
+        {
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("ru-RU");
+            InputLanguage.CurrentInputLanguage = InputLanguage.FromCulture(CultureInfo.DefaultThreadCurrentCulture);
+        }
+
+        private void tbProjFilter_Enter(object sender, EventArgs e)
+        {
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("ru-RU");
+            InputLanguage.CurrentInputLanguage = InputLanguage.FromCulture(CultureInfo.DefaultThreadCurrentCulture);
+        }
+
+        private void tbStatusFilter_Enter(object sender, EventArgs e)
+        {
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("ru-RU");
+            InputLanguage.CurrentInputLanguage = InputLanguage.FromCulture(CultureInfo.DefaultThreadCurrentCulture);
         }
     }
 }

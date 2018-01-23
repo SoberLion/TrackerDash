@@ -51,18 +51,7 @@ namespace TrackerHelper.Controls
         {
             InitializeComponent();
         }
-
-        private string ArrayToString(int[] array)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append(array[0]);
-            for(int i = 1; i < array.Length; i++)
-            {
-                sb.Append("," + array[i].ToString());
-            }
-            return sb.ToString();
-        }
-
+        
         public void GetDataTable()
         {
 
@@ -134,10 +123,10 @@ namespace TrackerHelper.Controls
                           LEFT JOIN Users u ON i.AssignedToId = u.Id
                           WHERE issueId IN
 	                          (SELECT IssueId FROM Journals WHERE CreatedOn < '{overdue}' AND id IN
-		                          (SELECT JournalId FROM JournalDetails WHERE newValue IN ({ArrayToString(StatusIdList)})))
-                          AND i.StatusId IN ({ArrayToString(StatusIdList)})
-                          AND i.AssignedToId IN ({ArrayToString(UserIdList)})
-                          AND i.ProjectId IN ({ArrayToString(ProjectIdArray)})
+		                          (SELECT JournalId FROM JournalDetails WHERE newValue IN ({string.Join(",", StatusIdList)})))
+                          AND i.StatusId IN ({string.Join(",", StatusIdList)})
+                          AND i.AssignedToId IN ({string.Join(",", UserIdList)})
+                          AND i.ProjectId IN ({string.Join(",", ProjectIdArray)})
                           GROUP BY i.AssignedToName, i.IssueId
                           ORDER BY u.Lastname";
             }
@@ -150,9 +139,9 @@ namespace TrackerHelper.Controls
                             FROM Issues i 
                             LEFT JOIN Users u ON i.AssignedToId = u.Id
                             WHERE i.CreatedOn < '{overdue}'
-                            AND i.StatusId IN ({ArrayToString(StatusIdList)})
-                            AND i.AssignedToId IN ({ArrayToString(UserIdList)})
-                            AND i.ProjectId IN ({ArrayToString(ProjectIdArray)})
+                            AND i.StatusId IN ({string.Join(",", StatusIdList)})
+                            AND i.AssignedToId IN ({string.Join(",", UserIdList)})
+                            AND i.ProjectId IN ({string.Join(",", ProjectIdArray)})
                             ORDER BY u.Lastname";
             }
 
