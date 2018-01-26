@@ -30,28 +30,13 @@ namespace TrackerHelper
         [DllImport("user32.dll")]
         private static extern bool ReleaseCapture();
 
-        [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
-        private static extern IntPtr CreateRoundRectRgn
-        (
-            int nLeftRect, // x-coordinate of upper-left corner
-            int nTopRect, // y-coordinate of upper-left corner
-            int nRightRect, // x-coordinate of lower-right corner
-            int nBottomRect, // y-coordinate of lower-right corner
-            int nWidthEllipse, // height of ellipse
-            int nHeightEllipse // width of ellipse
-        );
-        [DllImport("gdi32.dll", EntryPoint = "DeleteObject")]
-        private static extern bool DeleteObject(IntPtr hObject);
-
         public Dashboard()
         {
             InitializeComponent();
+            DBman.CreateDatabase();
             GetActivePreset();
             CreateDashboards();
             btnSlideshow_Click(btnSlideshow,EventArgs.Empty);
-         /*   IntPtr ptr = CreateRoundRectRgn(0, 0, this.Width, this.Height, 25, 25);
-            this.Region = Region.FromHrgn(ptr);
-            DeleteObject(ptr);*/
         }
 
         private void GetActivePreset()
@@ -60,6 +45,7 @@ namespace TrackerHelper
             if (activePreset == null)
             {
                 lblCaption.Text = "No active presets";
+                activePreset = new DashboardPreset();
             }
         }
 
@@ -175,7 +161,6 @@ namespace TrackerHelper
 
         private void Dashboard_Load(object sender, EventArgs e)
         {
-            DBman.CreateDatabase();
             tmrUpdate.Enabled = true;
             tmrUpdate.Interval = 300000/100;
             pbBGWork.ProgressValue = 100;
@@ -210,7 +195,7 @@ namespace TrackerHelper
 
             dbController.UpdateIssues(3, 1);
             dbController.UpdateTimeEntries(3, 1);
-            // dbController.UpdateUsers(3);
+            dbController.UpdateUsers(3);            
         }
 
         private void bgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -226,12 +211,14 @@ namespace TrackerHelper
             }
             else if (!(e.Error == null))
             {
+                tmrUpdate.Enabled = true;
             }
             else
             {
                 pbBGWork.ProgressValue = 100;
                 SetLblLastUpdateText("Last update: " + DateTime.Now.ToString("HH:mm:dd"));
                 tmrUpdate.Enabled = true;
+                //GC.Collect();
             }
         }
 
@@ -247,7 +234,12 @@ namespace TrackerHelper
         public IDashboardControlsUpdate getIssuesStatus(int statusId)
         {
             GetActivePreset();
-            DashboardIssuesStatus dash = Controls.Find(activePreset.Statuses.Find(s => s.ID == statusId).Name, true).FirstOrDefault() as DashboardIssuesStatus;
+            DashboardIssuesStatus dash = null;
+            try
+            {
+                dash = Controls.Find(activePreset.Statuses.Find(s => s.ID == statusId).Name, true).FirstOrDefault() as DashboardIssuesStatus;
+            }
+            catch { }
             if (dash != null)
             {
                 //return dash;
@@ -259,9 +251,9 @@ namespace TrackerHelper
                 Parent = this.pnlDashboard,
                 Dock = DockStyle.Fill,
                 BackColor = Color.FromArgb(41, 53, 65),
-                Name = activePreset.Statuses.Find(s => s.ID == statusId).Name,
+                Name = activePreset.Statuses.Find(s => s.ID == statusId)?.Name,
                 StatusIdList = new int[] { statusId },
-                HoursToOverdue = activePreset.Statuses.Find(s => s.ID == statusId).MaxHours,
+                HoursToOverdue = activePreset.Statuses.Find(s => s.ID == statusId) !=null ? activePreset.Statuses.Find(s => s.ID == statusId).MaxHours : 0,
                 UserIdList = activePreset.Employees.Select(p => p.id).ToArray(),
                 ProjectIdArray = activePreset.Projects.Select(p => p.id).ToArray()
             };
@@ -314,6 +306,10 @@ namespace TrackerHelper
 
         private void tmrSlideShow_Tick(object sender, EventArgs e)
         {
+            if (_dashboardList.Count == 0)
+            {
+                CreateDashboards();
+            }            
             tmrSlideShow.Enabled = false;
             _dashboardList[SlideCounter % _dashboardList.Count].ControlUpdate();
             SlideCounter++;

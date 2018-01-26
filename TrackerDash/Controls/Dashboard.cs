@@ -11,7 +11,6 @@ namespace TrackerDash.Controls
     class Dashboard : UserControl
     {
         protected DashboardPreset _preset = new DashboardPreset();
-        static string _dateFormat = "yyyy-MM-dd HH:mm:ss:fff";
         protected int[] _userIdArray = new int[] { 1 };
         protected int[] _statusIdArray = new int[] { 1 };
         protected int[] _projectIdArray = new int[] { 1 };

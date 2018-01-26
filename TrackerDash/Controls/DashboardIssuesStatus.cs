@@ -145,7 +145,7 @@ namespace TrackerHelper.Controls
                             ORDER BY u.Lastname";
             }
 
-            // joins way too long  :(
+            // using flattening cause joins way too slow  :(
             /* 
              SELECT iss.issueid as 'Номер задачи'
                             , strftime('%Y-%m-%d %H:%M',iss.CreatedOn) as 'Создан'
@@ -163,7 +163,7 @@ namespace TrackerHelper.Controls
              */
             return DBman.OpenQuery(query);
         }
-        //TODO Think about this method again
+
         public int GetHours(int dayStartHour, int dayEndHour, int maxHours)
         {
             DateTime Now = DateTime.Now;

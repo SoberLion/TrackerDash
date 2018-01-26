@@ -26,7 +26,7 @@ namespace TrackerHelper
                 using (StringReader sr = new StringReader(XmlString))
                     return (T)ser.Deserialize(sr);
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }

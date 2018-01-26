@@ -352,20 +352,20 @@ namespace TrackerHelper.Controls
 
         private void tbEmplFilter_Enter(object sender, EventArgs e)
         {
-            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("ru-RU");
-            InputLanguage.CurrentInputLanguage = InputLanguage.FromCulture(CultureInfo.DefaultThreadCurrentCulture);
+            CultureInfo ci = new CultureInfo("ru-RU");
+            InputLanguage.CurrentInputLanguage = InputLanguage.FromCulture(ci);
         }
 
         private void tbProjFilter_Enter(object sender, EventArgs e)
         {
-            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("ru-RU");
-            InputLanguage.CurrentInputLanguage = InputLanguage.FromCulture(CultureInfo.DefaultThreadCurrentCulture);
+            CultureInfo ci = new CultureInfo("ru-RU");
+            InputLanguage.CurrentInputLanguage = InputLanguage.FromCulture(ci);
         }
 
         private void tbStatusFilter_Enter(object sender, EventArgs e)
         {
-            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("ru-RU");
-            InputLanguage.CurrentInputLanguage = InputLanguage.FromCulture(CultureInfo.DefaultThreadCurrentCulture);
+            CultureInfo ci = new CultureInfo("ru-RU");
+            InputLanguage.CurrentInputLanguage = InputLanguage.FromCulture(ci);
         }
     }
 }

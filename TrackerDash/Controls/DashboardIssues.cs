@@ -46,10 +46,6 @@ namespace TrackerHelper.Controls
             cartesianChart.DataTooltip.IsEnabled = false;
             cartesianChart.DataTooltip.Visibility = System.Windows.Visibility.Hidden;
         }
-        private string ArrayToString(int[] array)
-        {
-                return string.Join(",", array); 
-        }
 
         public void UpdateTSDashboard()
         {
@@ -70,21 +66,22 @@ namespace TrackerHelper.Controls
 
         private void CreateUsersButtons()
         {
+            string UIDList = string.Join(",", UserIdList);
             pnlTopMid.Controls.Clear();
             pnlTopRight.Controls.Clear();
             
-            string todayTimeQuery = $@"SELECT UserName, ROUND(sum(hours),2) AS Hours FROM TimeEntries WHERE userid IN ({ArrayToString(UserIdList)}) 
+            string todayTimeQuery = $@"SELECT UserName, ROUND(sum(hours),2) AS Hours FROM TimeEntries WHERE userid IN ({UIDList}) 
                                     AND spenton LIKE '{DateTime.Now.ToString("yyyy-MM-dd")}%' 
                                     GROUP BY UserName
                                     ORDER BY UserName";
 
-            string WeekTimeQuery = $@"SELECT UserName, ROUND(sum(hours),2) AS Hours FROM TimeEntries WHERE userid IN ({ArrayToString(UserIdList)}) 
+            string WeekTimeQuery = $@"SELECT UserName, ROUND(sum(hours),2) AS Hours FROM TimeEntries WHERE userid IN ({UIDList}) 
                                     AND spenton > '{getFirstDayofWeekDate(DateTime.Now).AddDays(-1).ToString("yyyy-MM-dd 23:59:59:000")}' 
                                     AND spenton < '{DateTime.Now.ToString("yyyy-MM-dd 23:59:59:000")}'
                                     GROUP BY userid
                                     ORDER BY UserName";
 
-            string MonthTimeQuery = $@"SELECT UserName, ROUND(sum(hours),2) AS Hours FROM TimeEntries WHERE userid IN ({ArrayToString(UserIdList)}) 
+            string MonthTimeQuery = $@"SELECT UserName, ROUND(sum(hours),2) AS Hours FROM TimeEntries WHERE userid IN ({UIDList}) 
                                     AND spenton > '{DateTime.Now.ToString("yyyy-MM-01 00:00:00:001")}' 
                                     AND spenton < '{DateTime.Now.ToString("yyyy-MM-dd 23:59:59:000")}'
                                     GROUP BY UserName
@@ -94,7 +91,7 @@ namespace TrackerHelper.Controls
             DataRow[] weekTimeRows = DBman.OpenQuery(WeekTimeQuery).Select("");
             DataRow[] monthTimeRows = DBman.OpenQuery(MonthTimeQuery).Select("");
 
-            string query = $"SELECT DISTINCT Lastname, Firstname FROM Users WHERE Id IN ({ArrayToString(UserIdList)}) ORDER BY Lastname desc";
+            string query = $"SELECT DISTINCT Lastname, Firstname FROM Users WHERE Id IN ({UIDList}) ORDER BY Lastname desc";
 
             DataRow[] NameList = DBman.OpenQuery(query).Select("");
             for (int i = 0; i < NameList.Length; i++)
@@ -236,8 +233,8 @@ namespace TrackerHelper.Controls
             string query = $@"SELECT COUNT(*) AS IssuesCount, StatusName, (u.Lastname || ' ' ||u.Firstname) AS Name
                             FROM issues i 
                             LEFT JOIN Users u ON i.AssignedToId = u.id
-                            WHERE u.Id IN ({ArrayToString(UserIdList)}) 
-                            AND i.statusId IN ({ArrayToString(StatusIdList)}) 
+                            WHERE u.Id IN ({string.Join(",", UserIdList)}) 
+                            AND i.statusId IN ({string.Join(",", StatusIdList)}) 
                             GROUP BY StatusName, Name 
                             ORDER BY Name, StatusName";
 
@@ -311,7 +308,7 @@ namespace TrackerHelper.Controls
 
         public void UpdateLblStatusValue(object obj, string statusId)
         {
-            string query = $"SELECT count(*) FROM Issues WHERE AssignedToId in ({ArrayToString(UserIdList)}) AND StatusId = {statusId}";
+            string query = $"SELECT count(*) FROM Issues WHERE AssignedToId in ({string.Join(",", UserIdList)}) AND StatusId = {statusId}";
             DataTable dt = DBman.OpenQuery(query);
             (obj as Label).Text = dt.Rows[0][0].ToString() != "0" ? dt.Rows[0][0].ToString() : "";
         }
@@ -320,6 +317,7 @@ namespace TrackerHelper.Controls
 
         private void UpdateWeekLabels()
         {
+            string UIDList = string.Join(",", UserIdList);
             string thisBegin = string.Empty;
             string thisEnd = string.Empty;
             string LastBegin = string.Empty;
@@ -334,10 +332,10 @@ namespace TrackerHelper.Controls
             LastBegin = DateTime.Now.AddYears(-1).AddDays(-7).ToString("yyyy-MM-dd 00:00:00,001");
             LastEnd = DateTime.Now.AddYears(-1).ToString(_dateFormat);
 
-            string thisCreatedQuery = $"SELECT count(*) FROM Issues WHERE CreatedOn >= '{thisBegin}' AND CreatedOn < '{thisEnd}' AND AssignedToId in ({ArrayToString(UserIdList)})";
-            string LastCreatedQuery = $"SELECT count(*) FROM Issues WHERE CreatedOn >= '{LastBegin}' AND CreatedOn < '{LastEnd}' AND AssignedToId in ({ArrayToString(UserIdList)})";
-            string thisClosedQuery = $"SELECT count(*) FROM Issues WHERE ClosedOn >= '{thisBegin}' AND ClosedOn < '{thisEnd}' AND AssignedToId in ({ArrayToString(UserIdList)})";
-            string LastClosedQuery = $"SELECT count(*) FROM Issues WHERE ClosedOn >= '{LastBegin}' AND ClosedOn < '{LastEnd}' AND AssignedToId in ({ArrayToString(UserIdList)})";
+            string thisCreatedQuery = $"SELECT count(*) FROM Issues WHERE CreatedOn >= '{thisBegin}' AND CreatedOn < '{thisEnd}' AND AssignedToId in ({UIDList})";
+            string LastCreatedQuery = $"SELECT count(*) FROM Issues WHERE CreatedOn >= '{LastBegin}' AND CreatedOn < '{LastEnd}' AND AssignedToId in ({UIDList})";
+            string thisClosedQuery = $"SELECT count(*) FROM Issues WHERE ClosedOn >= '{thisBegin}' AND ClosedOn < '{thisEnd}' AND AssignedToId in ({UIDList})";
+            string LastClosedQuery = $"SELECT count(*) FROM Issues WHERE ClosedOn >= '{LastBegin}' AND ClosedOn < '{LastEnd}' AND AssignedToId in ({UIDList})";
 
             UpdateLabel(lblCreatedWeekThisYearValue, thisCreatedQuery);
             UpdateLabel(lblClosedWeekThisYearValue, thisClosedQuery);
@@ -346,6 +344,7 @@ namespace TrackerHelper.Controls
         }
         private void UpdateMonthLabels()
         {
+            string UIDList = string.Join(",", UserIdList);
             string thisBegin = string.Empty;
             string thisEnd = string.Empty;
             string LastBegin = string.Empty;
@@ -360,10 +359,10 @@ namespace TrackerHelper.Controls
             LastBegin = DateTime.Now.AddYears(-1).ToString("yyyy-MM-01 00:00:00,001");
             LastEnd = DateTime.Now.AddYears(-1).ToString(_dateFormat);
 
-            string thisCreatedQuery = $"SELECT count(*) FROM Issues WHERE CreatedOn >= '{thisBegin}' AND CreatedOn < '{thisEnd}' AND AssignedToId in ({ArrayToString(UserIdList)})";
-            string LastCreatedQuery = $"SELECT count(*) FROM Issues WHERE CreatedOn >= '{LastBegin}' AND CreatedOn < '{LastEnd}' AND AssignedToId in ({ArrayToString(UserIdList)})";
-            string thisClosedQuery = $"SELECT count(*) FROM Issues WHERE ClosedOn >= '{thisBegin}' AND ClosedOn < '{thisEnd}' AND AssignedToId in ({ArrayToString(UserIdList)})";
-            string LastClosedQuery = $"SELECT count(*) FROM Issues WHERE ClosedOn >= '{LastBegin}' AND ClosedOn < '{LastEnd}' AND AssignedToId in ({ArrayToString(UserIdList)})";
+            string thisCreatedQuery = $"SELECT count(*) FROM Issues WHERE CreatedOn >= '{thisBegin}' AND CreatedOn < '{thisEnd}' AND AssignedToId in ({UIDList})";
+            string LastCreatedQuery = $"SELECT count(*) FROM Issues WHERE CreatedOn >= '{LastBegin}' AND CreatedOn < '{LastEnd}' AND AssignedToId in ({UIDList})";
+            string thisClosedQuery = $"SELECT count(*) FROM Issues WHERE ClosedOn >= '{thisBegin}' AND ClosedOn < '{thisEnd}' AND AssignedToId in ({UIDList})";
+            string LastClosedQuery = $"SELECT count(*) FROM Issues WHERE ClosedOn >= '{LastBegin}' AND ClosedOn < '{LastEnd}' AND AssignedToId in ({UIDList})";
 
             UpdateLabel(lblCreatedMonthThisYearValue, thisCreatedQuery);
             UpdateLabel(lblClosedMonthThisYearValue, thisClosedQuery);
