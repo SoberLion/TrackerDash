@@ -14,7 +14,6 @@ namespace TrackerHelper.Controls
 {
     public partial class DashboardIssues : UserControl, IDashboardControlsUpdate
     {
-
         static string _dateFormat = "yyyy-MM-dd HH:mm:ss:fff";
         private int[] _userIdList = new int[] { 1 };
         private int[] _statusIdList = new int[] { 1 };
@@ -230,6 +229,7 @@ namespace TrackerHelper.Controls
 
         private void CartesianChartStackedColumns()
         {
+
             string query = $@"SELECT COUNT(*) AS IssuesCount, StatusName, (u.Lastname || ' ' ||u.Firstname) AS Name
                             FROM issues i 
                             LEFT JOIN Users u ON i.AssignedToId = u.id
@@ -375,8 +375,7 @@ namespace TrackerHelper.Controls
         {
             if (label is Label lbl)
             {
-                DataTable dt = DBman.OpenQuery(query);
-                lbl.Text = dt?.Rows[0][0].ToString();
+                lbl.Text = DBman.OpenQuery(query)?.Rows[0][0].ToString();
             }
         }
 

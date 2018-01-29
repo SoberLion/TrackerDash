@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using TrackerHelper.Controls;
 using TrackerHelper.DB;
+using System.Runtime;
 
 namespace TrackerHelper
 {
@@ -35,7 +36,7 @@ namespace TrackerHelper
             InitializeComponent();
             DBman.CreateDatabase();
             GetActivePreset();
-            CreateDashboards();
+            //CreateDashboards();
             btnSlideshow_Click(btnSlideshow,EventArgs.Empty);
         }
 
@@ -306,8 +307,12 @@ namespace TrackerHelper
 
         private void tmrSlideShow_Tick(object sender, EventArgs e)
         {
-            if (_dashboardList.Count == 0)
+            if (_dashboardList.Count == 0 || SlideCounter % _dashboardList.Count == 0)
             {
+                _dashboardList.Clear();
+                GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
                 CreateDashboards();
             }            
             tmrSlideShow.Enabled = false;
