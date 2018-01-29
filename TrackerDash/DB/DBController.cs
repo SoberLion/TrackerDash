@@ -66,8 +66,6 @@ namespace TrackerHelper.DB
 
         public void UpdateUsers(int Retries)
         {
-         //   GetRmIssues(Retries, NumofDaysSinceLastUpdate);
-
             GetRmUsers(Retries);
             UsersToPersons(_rmUsers);
             DBman.InsertPersons(_personList);
@@ -96,13 +94,16 @@ namespace TrackerHelper.DB
                         _rmUsers = XML.Deserialize<Users>(resultModel.Results);
                     } // IncOffset увеличивает offset на величину limit при каждом вызове.
                     _rmUsers.IncOffset();
-                    onProgressChange?.Invoke(new EventProgressArgs
+                    if (_rmUsers.total_count != 0)
                     {
-                        Percents = _rmUsers.offset * 100 / _rmUsers.total_count,
-                        Message = _rmUsers.offset < _rmUsers.total_count ?
-                                  $@"Обновляются профили пользователей: {_rmUsers.offset}/{_rmUsers.total_count}" :
-                                  $@"{_rmUsers.total_count}/{_rmUsers.total_count}"
-                    });
+                        onProgressChange?.Invoke(new EventProgressArgs
+                        {
+                            Percents = _rmUsers.offset * 100 / _rmUsers.total_count,
+                            Message = _rmUsers.offset < _rmUsers.total_count ?
+                                      $@"Обновляются профили пользователей: {_rmUsers.offset}/{_rmUsers.total_count}" :
+                                      $@"{_rmUsers.total_count}/{_rmUsers.total_count}"
+                        });
+                    }
                 }
                 else
                 {// в случае если запрос к redmine не был успешным сделать повторный запрос с теми же параметрами
@@ -140,13 +141,16 @@ namespace TrackerHelper.DB
                         _timeEntries = XML.Deserialize<Time_entries>(resultModel.Results);
                     } // IncOffset увеличивает offset на величину limit при каждом вызове.
                     _timeEntries.IncOffset();
-                    onProgressChange?.Invoke(new EventProgressArgs
+                    if (_timeEntries.total_count > 0)
                     {
-                        Percents = _timeEntries.offset * 100 / _timeEntries.total_count,
-                        Message = _timeEntries.offset < _timeEntries.total_count ? 
-                                  $@"Получение трудозатрат: {_timeEntries.offset}/{_timeEntries.total_count}" : 
-                                  $@"Получение трудозатрат: {_timeEntries.total_count}/{_timeEntries.total_count}"
-                    });
+                        onProgressChange?.Invoke(new EventProgressArgs
+                        {
+                            Percents = _timeEntries.offset * 100 / _timeEntries.total_count,
+                            Message = _timeEntries.offset < _timeEntries.total_count ?
+                                      $@"Получение трудозатрат: {_timeEntries.offset}/{_timeEntries.total_count}" :
+                                      $@"Получение трудозатрат: {_timeEntries.total_count}/{_timeEntries.total_count}"
+                        });
+                    }
                 }
                 else
                 {// в случае если запрос к redmine не был успешным сделать повторный запрос с теми же параметрами
@@ -185,14 +189,16 @@ namespace TrackerHelper.DB
                         _rmIssues = XML.Deserialize<Issues>(resultModel.Results);
                     } // IncOffset увеличивает offset на величину limit при каждом вызове.
                     _rmIssues.IncOffset();
-
-                    onProgressChange?.Invoke(new EventProgressArgs
+                    if (_rmIssues.total_count > 0)
                     {
-                        Percents = _rmIssues.offset * 100 / _rmIssues.total_count,
-                        Message = _rmIssues.offset < _rmIssues.total_count ?
-                                  $@"Получение списка задач: {_rmIssues.offset}/{_rmIssues.total_count}" :
-                                  $@"Получение списка задач: {_rmIssues.total_count}/{_rmIssues.total_count}"
-                    });
+                        onProgressChange?.Invoke(new EventProgressArgs
+                        {
+                            Percents = _rmIssues.offset * 100 / _rmIssues.total_count,
+                            Message = _rmIssues.offset < _rmIssues.total_count ?
+                                      $@"Получение списка задач: {_rmIssues.offset}/{_rmIssues.total_count}" :
+                                      $@"Получение списка задач: {_rmIssues.total_count}/{_rmIssues.total_count}"
+                        });
+                    }
                 }
                 else
                 {// в случае если запрос к redmine не был успешным сделать повторный запрос с теми же параметрами                    
@@ -216,12 +222,14 @@ namespace TrackerHelper.DB
                 issue = Issue.GetIssue(url);
                 if (issue != null)
                     _person.IssuesUpdated.issue.Add(issue);
-
-                onProgressChange?.Invoke(new EventProgressArgs
+                if (_person.Issues.issue.Count > 0)
                 {
-                    Percents = i * 100 / _person.Issues.issue.Count,
-                    Message = $@"Обновление задачи: {i + 1}/{_person.Issues.issue.Count}"
-                });
+                    onProgressChange?.Invoke(new EventProgressArgs
+                    {
+                        Percents = i * 100 / _person.Issues.issue.Count,
+                        Message = $@"Обновление задачи: {i + 1}/{_person.Issues.issue.Count}"
+                    });
+                }
             }
         }
         private void UsersToPersons(Users users)
