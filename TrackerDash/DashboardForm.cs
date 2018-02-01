@@ -219,7 +219,6 @@ namespace TrackerHelper
                 pbBGWork.ProgressValue = 100;
                 SetLblLastUpdateText("Last update: " + DateTime.Now.ToString("HH:mm:dd"));
                 tmrUpdate.Enabled = true;
-                //GC.Collect();
             }
         }
 
@@ -307,12 +306,9 @@ namespace TrackerHelper
 
         private void tmrSlideShow_Tick(object sender, EventArgs e)
         {
-            if (_dashboardList.Count == 0 || SlideCounter % _dashboardList.Count == 0)
+            if (_dashboardList.Count == 0)
             {
                 _dashboardList.Clear();
-                GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
                 CreateDashboards();
             }            
             tmrSlideShow.Enabled = false;
@@ -338,6 +334,16 @@ namespace TrackerHelper
         private void btnSlideshow_Click(object sender, EventArgs e)
         {
             Toggle(sender);
+        }
+
+        private async Task CollectGarbageAsync()
+        {
+            await Task.Run(() =>
+            {
+                GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+            });
         }
     }
 }

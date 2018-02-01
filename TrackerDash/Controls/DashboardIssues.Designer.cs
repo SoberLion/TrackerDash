@@ -629,6 +629,7 @@
             this.cartesianChart.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.cartesianChart.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.cartesianChart.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.cartesianChart.ForeColor = System.Drawing.SystemColors.Control;
             this.cartesianChart.Location = new System.Drawing.Point(10, 3);

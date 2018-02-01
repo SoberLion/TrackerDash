@@ -25,6 +25,7 @@ namespace TrackerHelper.DB
             using (SQLiteConnection conn = new SQLiteConnection($"Data Source={_dbName}; Version=3;"))
             {
                 conn.Open();
+
                 using (SQLiteCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = "SELECT name FROM sqlite_master WHERE type = 'table' AND name = '" + TableName + "';";
@@ -43,7 +44,11 @@ namespace TrackerHelper.DB
                         onError?.Invoke($"Error: {ex.Message}");
                         return false;
                     }
-                }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }                
             }
         }
 
@@ -106,6 +111,8 @@ namespace TrackerHelper.DB
                         onError?.Invoke($"Error: {ex.Message}");
                     }
                 }
+
+                conn.Close();
             }
         }
         private static void CreateIssuesTable()
@@ -155,6 +162,8 @@ namespace TrackerHelper.DB
                         onError?.Invoke($"Error: {ex.Message}");
                     }
                 }
+
+                conn.Close();
             }
         }
         private static void CreateJournalsTable()
@@ -185,6 +194,8 @@ namespace TrackerHelper.DB
                         onError?.Invoke($"Error: {ex.Message}");
                     }
                 }
+
+                conn.Close();
             }
         }
         private static void CreateJournalDetailsTable()
@@ -215,6 +226,8 @@ namespace TrackerHelper.DB
                         onError?.Invoke($"Error: {ex.Message}");
                     }
                 }
+
+                conn.Close();
             }
         }
         private static void CreateUsersTable()
@@ -255,6 +268,8 @@ namespace TrackerHelper.DB
                         onError?.Invoke($"Error: {ex.Message}");
                     }
                 }
+
+                conn.Close();
             }
         }
         private static void CreatePresetsTable()
@@ -282,6 +297,8 @@ namespace TrackerHelper.DB
                         onError?.Invoke($"Error: {ex.Message}");
                     }
                 }
+
+                conn.Close();
             }
         }
         private static void CreateEmployeesPresetsTable()
@@ -310,6 +327,8 @@ namespace TrackerHelper.DB
                         onError?.Invoke($"Error: {ex.Message}");
                     }
                 }
+
+                conn.Close();
             }
         }
         private static void CreateProjectsPresetsTable()
@@ -338,6 +357,8 @@ namespace TrackerHelper.DB
                         onError?.Invoke($"Error: {ex.Message}");
                     }
                 }
+
+                conn.Close();
             }
         }
         private static void CreateStatusPresetsTable()
@@ -367,9 +388,10 @@ namespace TrackerHelper.DB
                         onError?.Invoke($"Error: {ex.Message}");
                     }
                 }
+
+                conn.Close();
             }
         }
-
 
         #endregion
 
@@ -455,6 +477,8 @@ namespace TrackerHelper.DB
                         }
                     }
                 }
+
+                conn.Close();
             }
         }
         public static void InsertPerson(Person person)
@@ -524,6 +548,8 @@ namespace TrackerHelper.DB
                         }                        
                     }
                 }
+
+                conn.Close();
             }
         }
         // insert time entry to table
@@ -586,6 +612,8 @@ namespace TrackerHelper.DB
                         transaction.Commit();
                     }
                 }
+
+                conn.Close();
             }
         }
         public static void InsertIssues(Issues issues)
@@ -740,6 +768,8 @@ namespace TrackerHelper.DB
 
                     }
                 }
+
+                conn.Close();
             }
         }
         public static void InsertIssue(Issue issue)
@@ -829,6 +859,8 @@ namespace TrackerHelper.DB
                         transaction.Commit();
                     }
                 }
+
+                conn.Close();
             }
         }
         private static void InsertJournals(Issue issue)
@@ -882,6 +914,8 @@ namespace TrackerHelper.DB
                         transaction.Commit();
                     }
                 }
+
+                conn.Close();
             }
         }
         private static void InsertDetails(Issue issue)
@@ -926,6 +960,8 @@ namespace TrackerHelper.DB
                         transaction.Commit();
                     }
                 }
+
+                conn.Close();
             }
         }
         public static void InsertPreset(DashboardPreset preset)
@@ -1024,6 +1060,8 @@ namespace TrackerHelper.DB
                         transaction.Commit();
                     }
                 }
+
+                conn.Close();
             }
         }
         public static void DeletePreset(int PresetId)
@@ -1053,6 +1091,8 @@ namespace TrackerHelper.DB
                         onError?.Invoke($"Error: {ex.Message}");
                     }
                 }
+
+                conn.Close();
             }
         }
 
@@ -1110,6 +1150,8 @@ namespace TrackerHelper.DB
                 cmd.Dispose();
                 conn.Dispose();
             }
+
+            conn.Close();
         }
 
         public enum IssueType
@@ -1137,6 +1179,7 @@ namespace TrackerHelper.DB
                     dataSet.Reset();
                     dataAdapter.Fill(dataSet);
                     dt = dataSet.Tables[0];
+                    conn.Close();
                 }
             }
             return dt;
@@ -1162,7 +1205,8 @@ namespace TrackerHelper.DB
                     {
                         onError?.Invoke($"Exception: {ex.Message}");
                     }
-                }                
+                }
+                conn.Close();
             }
         }
 
@@ -1222,6 +1266,8 @@ namespace TrackerHelper.DB
                         }
                     }
                 }
+
+                conn.Close();
             }
         }
 
@@ -1277,6 +1323,8 @@ namespace TrackerHelper.DB
                 cmd.Dispose();
                 conn.Dispose();
             }
+
+            conn.Close();
         }
 
         public static List<DashboardPreset> GetPresetList()
@@ -1314,6 +1362,8 @@ namespace TrackerHelper.DB
                         }
                     }
                 }
+
+                conn.Close();
             }
             for(int i = 0; i< presetList.Count;i++)
             {
@@ -1358,6 +1408,8 @@ namespace TrackerHelper.DB
                         }
                     }
                 }
+
+                conn.Close();
             }
             if (preset != null)
             {
@@ -1404,6 +1456,8 @@ namespace TrackerHelper.DB
                         }
                     }
                 }
+
+                conn.Close();
             }
 
             return projectslist;
@@ -1445,6 +1499,8 @@ namespace TrackerHelper.DB
                         }
                     }
                 }
+
+                conn.Close();
             }
 
             return employeesList;
@@ -1486,6 +1542,8 @@ namespace TrackerHelper.DB
                         }
                     }
                 }
+
+                conn.Close();
             }
 
             return StatusesList;
