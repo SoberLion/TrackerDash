@@ -174,7 +174,7 @@ namespace TrackerHelper
         private void Dashboard_Load(object sender, EventArgs e)
         {
             tmrUpdate.Enabled = true;
-            tmrUpdate.Interval = 300000/100;
+            tmrUpdate.Interval = 3000;
             pbBGWork.ProgressValue = 100;
         }
 
@@ -182,10 +182,10 @@ namespace TrackerHelper
         {
             pbBGWork.ProgressValue -= 1;
             if (pbBGWork.ProgressValue == 0)
-            {
-                tmrUpdate.Enabled = false;
+            {                
                 if (bgWorker.IsBusy != true)
                 {
+                    tmrUpdate.Enabled = false;
                     bgWorker.RunWorkerAsync();
                 }
             }
@@ -205,6 +205,7 @@ namespace TrackerHelper
                 SetLblLastUpdateText(args.Message);
             };
 
+            dbController.UpdateIssues(3, ActivePreset.UpdateDays);
             dbController.UpdateTimeEntries(3, ActivePreset.UpdateDays);
             dbController.UpdateUsers(3);
         }
@@ -306,10 +307,10 @@ namespace TrackerHelper
         }
 
         private void btnUpdate_Click(object sender, EventArgs e)
-        {
-            tmrUpdate.Enabled = false;
+        {            
             if (bgWorker.IsBusy != true)
             {
+                tmrUpdate.Enabled = false;
                 GetActivePreset();
                 bgWorker.RunWorkerAsync();
             }
