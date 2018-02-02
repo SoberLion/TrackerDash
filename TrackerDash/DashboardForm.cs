@@ -9,8 +9,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TrackerHelper.Controls;
+using Microsoft.Win32;
 using TrackerHelper.DB;
 using System.Runtime;
+
 
 namespace TrackerHelper
 {
@@ -46,10 +48,48 @@ namespace TrackerHelper
         public Dashboard()
         {
             InitializeComponent();
-            DBman.CreateDatabase();
-            GetActivePreset();
-            //btnSlideshow_Click(btnSlideshow,EventArgs.Empty);
         }
+
+        private void Get45or451FromRegistry()
+        {
+            int releaseKey = 0;
+            using (RegistryKey ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey("SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v4\\Full\\"))
+            {
+                releaseKey = Convert.ToInt32(ndpKey.GetValue("Release"));
+            }
+            if ((releaseKey < 378675))
+            {
+                MessageBox.Show(".NET Framework lower than 4.5.1");
+                Close();
+            }
+        }
+
+        private static bool CheckFor45DotVersion(int releaseKey)
+        {
+            /*if (releaseKey >= 393273)
+            {
+                return "4.6 RC or later";
+            }
+            if ((releaseKey >= 379893))
+            {
+                return "4.5.2 or later";
+            }
+            if ((releaseKey >= 378675))
+            {
+                return "4.5.1 or later";
+            }
+            if ((releaseKey >= 378389))
+            {
+                return "4.5 or later";
+            }*/
+
+            if ((releaseKey < 378675))
+            {
+                MessageBox.Show(".NET Framework lower than 4.5.1");
+                return false;
+            }
+            return true;
+            }
 
         private void GetActivePreset()
         {
@@ -109,7 +149,6 @@ namespace TrackerHelper
 
         private void btnTechSupp_Click(object sender, EventArgs e)
         {
-
             Toggle(sender);
             lblCaption.Text = "Main";
 
@@ -171,13 +210,6 @@ namespace TrackerHelper
             }
         }
 
-        private void Dashboard_Load(object sender, EventArgs e)
-        {
-            tmrUpdate.Enabled = true;
-            tmrUpdate.Interval = 3000;
-            pbBGWork.ProgressValue = 100;
-        }
-
         private void timer_Tick(object sender, EventArgs e)
         {
             pbBGWork.ProgressValue -= 1;
@@ -191,7 +223,7 @@ namespace TrackerHelper
             }
         }
 
-        private void bgWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        private void bgWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             Person user = new Person
             {
@@ -210,10 +242,9 @@ namespace TrackerHelper
             dbController.UpdateUsers(3);
         }
 
-        private void bgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
+        private void bgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) =>
             pbBGWork.ProgressValue = e.ProgressPercentage;
-        }
+
 
         private void bgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -351,14 +382,27 @@ namespace TrackerHelper
             Toggle(sender);
         }
 
-       /* private async Task CollectGarbageAsync()
+        private void Dashboard_Shown(object sender, EventArgs e)
         {
-            await Task.Run(() =>
-            {
-                GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-            });
-        }*/
+            Get45or451FromRegistry();
+            DBman.CreateDatabase();
+            GetActivePreset();
+
+            tmrUpdate.Enabled = true;
+            tmrUpdate.Interval = 3000;
+            pbBGWork.ProgressValue = 100;
+
+            btnSlideshow_Click(btnSlideshow, EventArgs.Empty);
+        }
+
+        /* private async Task CollectGarbageAsync()
+         {
+             await Task.Run(() =>
+             {
+                 GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+                 GC.Collect();
+                 GC.WaitForPendingFinalizers();
+             });
+         }*/
     }
 }
