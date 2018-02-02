@@ -293,6 +293,7 @@ namespace TrackerHelper.Controls
 
             cartesianChart.AxisX.Clear();
             cartesianChart.AxisY.Clear();
+            cartesianChart.Series.Clear();
 
             cartesianChart.Series = col;
             cartesianChart.AxisX.Add(ax);

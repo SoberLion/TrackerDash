@@ -18,9 +18,21 @@ namespace TrackerHelper
     {
         delegate void Message(string message);
 
-        private int SlideCounter = 0;
+        private int _slideCounter = 0;
 
-        DashboardPreset activePreset { get; set; }
+        DashboardPreset _activePreset { get; set; }
+
+        public DashboardPreset ActivePreset
+        {
+            get { return _activePreset; }
+            set { _activePreset = value; }
+        }
+
+        public int SlideCounter
+        {
+            get { return _slideCounter; }
+            set { _slideCounter = value; }
+        }
 
         private List<IDashboardControlsUpdate> _dashboardList = new List<IDashboardControlsUpdate>();
 
@@ -36,17 +48,16 @@ namespace TrackerHelper
             InitializeComponent();
             DBman.CreateDatabase();
             GetActivePreset();
-            //CreateDashboards();
-            btnSlideshow_Click(btnSlideshow,EventArgs.Empty);
+            //btnSlideshow_Click(btnSlideshow,EventArgs.Empty);
         }
 
         private void GetActivePreset()
         {
-            activePreset = DBman.GetActivePreset();
-            if (activePreset == null)
+            ActivePreset = DBman.GetActivePreset();
+            if (ActivePreset == null)
             {
                 lblCaption.Text = "No active presets";
-                activePreset = new DashboardPreset();
+                ActivePreset = new DashboardPreset();
             }
         }
 
@@ -194,9 +205,8 @@ namespace TrackerHelper
                 SetLblLastUpdateText(args.Message);
             };
 
-            dbController.UpdateIssues(3, 1);
-            dbController.UpdateTimeEntries(3, 1);
-            dbController.UpdateUsers(3);            
+            dbController.UpdateTimeEntries(3, ActivePreset.UpdateDays);
+            dbController.UpdateUsers(3);
         }
 
         private void bgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -237,7 +247,7 @@ namespace TrackerHelper
             DashboardIssuesStatus dash = null;
             try
             {
-                dash = Controls.Find(activePreset.Statuses.Find(s => s.ID == statusId).Name, true).FirstOrDefault() as DashboardIssuesStatus;
+                dash = Controls.Find(ActivePreset.Statuses.Find(s => s.ID == statusId).Name, true).FirstOrDefault() as DashboardIssuesStatus;
             }
             catch { }
             if (dash != null)
@@ -251,11 +261,11 @@ namespace TrackerHelper
                 Parent = this.pnlDashboard,
                 Dock = DockStyle.Fill,
                 BackColor = Color.FromArgb(41, 53, 65),
-                Name = activePreset.Statuses.Find(s => s.ID == statusId)?.Name,
+                Name = ActivePreset.Statuses.Find(s => s.ID == statusId)?.Name,
                 StatusIdList = new int[] { statusId },
-                HoursToOverdue = activePreset.Statuses.Find(s => s.ID == statusId) !=null ? activePreset.Statuses.Find(s => s.ID == statusId).MaxHours : 0,
-                UserIdList = activePreset.Employees.Select(p => p.id).ToArray(),
-                ProjectIdArray = activePreset.Projects.Select(p => p.id).ToArray()
+                HoursToOverdue = ActivePreset.Statuses.Find(s => s.ID == statusId) !=null ? ActivePreset.Statuses.Find(s => s.ID == statusId).MaxHours : 0,
+                UserIdList = ActivePreset.Employees.Select(p => p.id).ToArray(),
+                ProjectIdArray = ActivePreset.Projects.Select(p => p.id).ToArray()
             };
              
             return dash;
@@ -277,8 +287,8 @@ namespace TrackerHelper
                 Dock = DockStyle.Fill,
                 BackColor = Color.FromArgb(41, 53, 65),
                 Name = "DashboardIssues",
-                UserIdList = activePreset.Employees.Select(p => p.id).ToArray(),
-                StatusIdList = activePreset.Statuses.Select(p => p.ID).ToArray(),
+                UserIdList = ActivePreset.Employees.Select(p => p.id).ToArray(),
+                StatusIdList = ActivePreset.Statuses.Select(p => p.ID).ToArray()
             };
             return dash;
         }
@@ -300,6 +310,7 @@ namespace TrackerHelper
             tmrUpdate.Enabled = false;
             if (bgWorker.IsBusy != true)
             {
+                GetActivePreset();
                 bgWorker.RunWorkerAsync();
             }
         }
@@ -333,10 +344,13 @@ namespace TrackerHelper
 
         private void btnSlideshow_Click(object sender, EventArgs e)
         {
+            GetActivePreset();
+            SlideCounter = 0;
+            _dashboardList.Clear();
             Toggle(sender);
         }
 
-        private async Task CollectGarbageAsync()
+       /* private async Task CollectGarbageAsync()
         {
             await Task.Run(() =>
             {
@@ -344,6 +358,6 @@ namespace TrackerHelper
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
             });
-        }
+        }*/
     }
 }

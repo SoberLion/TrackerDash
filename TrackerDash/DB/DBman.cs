@@ -280,10 +280,11 @@ namespace TrackerHelper.DB
 
                 using (SQLiteCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = string.Format("CREATE TABLE IF NOT EXISTS Presets({0},{1},{2});",
+                    cmd.CommandText = string.Format("CREATE TABLE IF NOT EXISTS Presets({0},{1},{2},{3});",
                                          "PresetID INTEGER PRIMARY KEY",
                                          "PresetName TEXT",
-                                         "isActive INTEGER");
+                                         "isActive INTEGER",
+                                         "UpdateDays INTEGER");
                     try
                     {
                         cmd.ExecuteNonQuery();
@@ -976,12 +977,13 @@ namespace TrackerHelper.DB
                     {
                         SQLiteTransaction transaction = conn.BeginTransaction();
 
-                        cmd.CommandText = @"INSERT OR REPLACE INTO Presets(PresetId, PresetName, isActive) 
-                                            VALUES (@PresetId, @PresetName, @isActive)";
+                        cmd.CommandText = @"INSERT OR REPLACE INTO Presets(PresetId, PresetName, isActive, UpdateDays) 
+                                            VALUES (@PresetId, @PresetName, @isActive, @UpdateDays)";
                         // create command parameters
                         cmd.Parameters.AddWithValue("@PresetId", "");
                         cmd.Parameters.AddWithValue("@PresetName", "");
                         cmd.Parameters.AddWithValue("@isActive", "");
+                        cmd.Parameters.AddWithValue("@UpdateDays", "");
                         try
                         {
                             if (preset.Employees.Count > 0)
@@ -1047,6 +1049,8 @@ namespace TrackerHelper.DB
                             cmd.Parameters["@PresetID"].Value = preset.ID;
                             cmd.Parameters["@PresetName"].Value = preset.Name;
                             cmd.Parameters["@isActive"].Value = preset.isActive == true ? 1 : 0;
+                            cmd.Parameters["@UpdateDays"].Value = preset.UpdateDays;
+
                             cmd.ExecuteNonQuery();
                         }
                         catch (SQLiteException sqlex)
@@ -1153,7 +1157,6 @@ namespace TrackerHelper.DB
 
             conn.Close();
         }
-
         public enum IssueType
         {
             Created,
@@ -1165,7 +1168,6 @@ namespace TrackerHelper.DB
             Month,
             Year,
         }
-
         public static DataTable OpenQuery(string sql)
         {
             DataTable dt = null;
@@ -1209,7 +1211,6 @@ namespace TrackerHelper.DB
                 conn.Close();
             }
         }
-
         public static void GetOpenedIssues(Issues issues, int NumOfDays)
         {
             using (SQLiteConnection conn = new SQLiteConnection($"Data Source={_dbName}; Version=3;"))
@@ -1270,7 +1271,6 @@ namespace TrackerHelper.DB
                 conn.Close();
             }
         }
-
         public static void GetIssuesListByUserId(string UserId, Issues issues)
         {
             SQLiteConnection conn = new SQLiteConnection($"Data Source={_dbName}; Version=3;");
@@ -1326,7 +1326,6 @@ namespace TrackerHelper.DB
 
             conn.Close();
         }
-
         public static List<DashboardPreset> GetPresetList()
         {
             List<DashboardPreset> presetList = new List<DashboardPreset>();
@@ -1348,6 +1347,7 @@ namespace TrackerHelper.DB
                                 preset.ID = Convert.ToInt32(r["PresetID"].ToString());
                                 preset.Name = r["PresetName"].ToString();
                                 preset.isActive = Convert.ToInt32(r["isActive"].ToString()) == 0 ? false : true;
+                                preset.UpdateDays = Convert.ToInt32(r["UpdateDays"].ToString());
                                 presetList.Add(preset);
                             }
                             r.Close();
@@ -1395,6 +1395,7 @@ namespace TrackerHelper.DB
                                 preset.ID = Convert.ToInt32(r["PresetID"].ToString());
                                 preset.Name = r["PresetName"].ToString();
                                 preset.isActive = Convert.ToInt32(r["isActive"].ToString()) == 0 ? false : true;
+                                preset.UpdateDays = Convert.ToInt32(r["UpdateDays"].ToString());
                             }
                             r.Close();
                         }
@@ -1548,6 +1549,7 @@ namespace TrackerHelper.DB
 
             return StatusesList;
         }
+       // public static
         #endregion
     }
 }

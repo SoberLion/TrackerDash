@@ -35,6 +35,8 @@
             this.pnlStatus = new System.Windows.Forms.Panel();
             this.clbStatus = new System.Windows.Forms.CheckedListBox();
             this.pnlStatusPreset = new System.Windows.Forms.Panel();
+            this.tbUpdateDays = new System.Windows.Forms.TextBox();
+            this.lblUpdateDays = new System.Windows.Forms.Label();
             this.pnlStatusHours = new System.Windows.Forms.Panel();
             this.plnLayoutTop = new System.Windows.Forms.Panel();
             this.pnlLayoutTopButtons = new System.Windows.Forms.Panel();
@@ -130,12 +132,38 @@
             // 
             // pnlStatusPreset
             // 
+            this.pnlStatusPreset.Controls.Add(this.tbUpdateDays);
+            this.pnlStatusPreset.Controls.Add(this.lblUpdateDays);
             this.pnlStatusPreset.Controls.Add(this.pnlStatusHours);
             this.pnlStatusPreset.Dock = System.Windows.Forms.DockStyle.Right;
             this.pnlStatusPreset.Location = new System.Drawing.Point(900, 81);
             this.pnlStatusPreset.Name = "pnlStatusPreset";
             this.pnlStatusPreset.Size = new System.Drawing.Size(816, 885);
             this.pnlStatusPreset.TabIndex = 4;
+            // 
+            // tbUpdateDays
+            // 
+            this.tbUpdateDays.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbUpdateDays.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tbUpdateDays.Location = new System.Drawing.Point(758, 22);
+            this.tbUpdateDays.Name = "tbUpdateDays";
+            this.tbUpdateDays.Size = new System.Drawing.Size(44, 13);
+            this.tbUpdateDays.TabIndex = 4;
+            this.tbUpdateDays.Text = "1";
+            this.tbUpdateDays.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.tbUpdateDays.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbKeyPress);
+            // 
+            // lblUpdateDays
+            // 
+            this.lblUpdateDays.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblUpdateDays.AutoSize = true;
+            this.lblUpdateDays.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.lblUpdateDays.ForeColor = System.Drawing.Color.Gainsboro;
+            this.lblUpdateDays.Location = new System.Drawing.Point(758, 3);
+            this.lblUpdateDays.Name = "lblUpdateDays";
+            this.lblUpdateDays.Size = new System.Drawing.Size(44, 16);
+            this.lblUpdateDays.TabIndex = 5;
+            this.lblUpdateDays.Text = "Days";
             // 
             // pnlStatusHours
             // 
@@ -253,7 +281,7 @@
             this.tbProjFilter.Size = new System.Drawing.Size(270, 13);
             this.tbProjFilter.TabIndex = 1;
             this.tbProjFilter.TextChanged += new System.EventHandler(this.tbProjFilter_TextChanged);
-            this.tbProjFilter.Enter += new System.EventHandler(this.tbProjFilter_Enter);
+            this.tbProjFilter.Enter += new System.EventHandler(this.tbStatusFilter_Enter);
             // 
             // tbEmplFilter
             // 
@@ -263,7 +291,7 @@
             this.tbEmplFilter.Size = new System.Drawing.Size(270, 13);
             this.tbEmplFilter.TabIndex = 0;
             this.tbEmplFilter.TextChanged += new System.EventHandler(this.tbEmplFilter_TextChanged);
-            this.tbEmplFilter.Enter += new System.EventHandler(this.tbEmplFilter_Enter);
+            this.tbEmplFilter.Enter += new System.EventHandler(this.tbStatusFilter_Enter);
             // 
             // DashboardSettingsInfo
             // 
@@ -281,6 +309,7 @@
             this.pnlProjects.ResumeLayout(false);
             this.pnlStatus.ResumeLayout(false);
             this.pnlStatusPreset.ResumeLayout(false);
+            this.pnlStatusPreset.PerformLayout();
             this.plnLayoutTop.ResumeLayout(false);
             this.pnlLayoutTopButtons.ResumeLayout(false);
             this.pnlLayoutTopButtons.PerformLayout();
@@ -311,5 +340,7 @@
         private System.Windows.Forms.TextBox tbStatusFilter;
         private System.Windows.Forms.TextBox tbProjFilter;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox tbUpdateDays;
+        private System.Windows.Forms.Label lblUpdateDays;
     }
 }

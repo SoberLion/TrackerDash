@@ -82,6 +82,8 @@ namespace TrackerHelper.Controls
             }
 
             tbName.Text = Preset.Name;
+            tbUpdateDays.Text = Preset.UpdateDays.ToString();
+
         }
         private void btnSave_Click(object sender, EventArgs e)
         {
@@ -98,6 +100,8 @@ namespace TrackerHelper.Controls
                 }
 
                 Preset.Name = tbName.Text;
+                Preset.UpdateDays = int.Parse(tbUpdateDays.Text ?? "1");
+
                 DBman.DeletePreset(Preset.ID);
                 DBman.InsertPreset(Preset);
                 onSave?.Invoke();
@@ -350,22 +354,7 @@ namespace TrackerHelper.Controls
             }
         }
 
-        private void tbEmplFilter_Enter(object sender, EventArgs e)
-        {
-            CultureInfo ci = new CultureInfo("ru-RU");
-            InputLanguage.CurrentInputLanguage = InputLanguage.FromCulture(ci);
-        }
-
-        private void tbProjFilter_Enter(object sender, EventArgs e)
-        {
-            CultureInfo ci = new CultureInfo("ru-RU");
-            InputLanguage.CurrentInputLanguage = InputLanguage.FromCulture(ci);
-        }
-
-        private void tbStatusFilter_Enter(object sender, EventArgs e)
-        {
-            CultureInfo ci = new CultureInfo("ru-RU");
-            InputLanguage.CurrentInputLanguage = InputLanguage.FromCulture(ci);
-        }
+        private void tbStatusFilter_Enter(object sender, EventArgs e) => 
+            InputLanguage.CurrentInputLanguage = InputLanguage.FromCulture(new CultureInfo("ru-RU"));
     }
 }

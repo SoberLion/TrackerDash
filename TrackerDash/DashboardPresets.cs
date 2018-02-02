@@ -80,6 +80,7 @@ namespace TrackerHelper
         private List<IdName> _projects = new List<IdName>();
         private List<Status> _statuses = new List<Status>();
         private bool _isActive = false;
+        private int _UpdateDays = 1;
 
         public int ID
         {
@@ -110,6 +111,12 @@ namespace TrackerHelper
         {
             get { return _isActive; }
             set { _isActive = value; }
+        }
+
+        public int UpdateDays
+        {
+            get { return _UpdateDays; }
+            set { _UpdateDays = value; }
         }
 
         public DashboardPreset()
