@@ -20,6 +20,7 @@ namespace TrackerHelper
     {
         delegate void Message(string message);
 
+        private int _updateCounter = 0;
         private int _slideCounter = 0;
 
         DashboardPreset _activePreset { get; set; }
@@ -239,7 +240,9 @@ namespace TrackerHelper
 
             dbController.UpdateIssues(3, ActivePreset.UpdateDays);
             dbController.UpdateTimeEntries(3, ActivePreset.UpdateDays);
-            dbController.UpdateUsers(3);
+
+            if (_updateCounter % 20 == 0)
+                dbController.UpdateUsers(3);
         }
 
         private void bgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) =>
@@ -261,6 +264,7 @@ namespace TrackerHelper
                 pbBGWork.ProgressValue = 100;
                 SetLblLastUpdateText("Last update: " + DateTime.Now.ToString("HH:mm:dd"));
                 tmrUpdate.Enabled = true;
+                _updateCounter++;
             }
         }
 
@@ -299,8 +303,15 @@ namespace TrackerHelper
                 UserIdList = ActivePreset.Employees.Select(p => p.id).ToArray(),
                 ProjectIdArray = ActivePreset.Projects.Select(p => p.id).ToArray()
             };
-             
+            dash.onEmpty += getNextDashboard;
+
             return dash;
+        }
+
+        private void getNextDashboard()
+        {
+            SlideCounter++;
+            tmrSlideShow_Tick(tmrSlideShow, EventArgs.Empty);
         }
 
         public IDashboardControlsUpdate getDashboardIssues()
@@ -324,6 +335,7 @@ namespace TrackerHelper
             };
             return dash;
         }
+
         private void SetLblLastUpdateText(string message)
         {
             if (lblLastUpdate.InvokeRequired)

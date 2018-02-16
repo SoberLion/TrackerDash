@@ -448,6 +448,7 @@
             // pnlLayoutMid
             // 
             this.pnlLayoutMid.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(53)))), ((int)(((byte)(65)))));
+            this.pnlLayoutMid.Controls.Add(this.pnlSplash);
             this.pnlLayoutMid.Controls.Add(this.pnlStatusNeedInfoEmpl);
             this.pnlLayoutMid.Controls.Add(this.lblPnlStatusHeader);
             this.pnlLayoutMid.Controls.Add(this.pnlStatusEscalated);
@@ -674,7 +675,6 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.WindowFrame;
-            this.Controls.Add(this.pnlSplash);
             this.Controls.Add(this.pnlLayoutTop);
             this.Controls.Add(this.pnlLayoutMid);
             this.Controls.Add(this.pnlHorizDividerBot);

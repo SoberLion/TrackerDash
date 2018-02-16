@@ -4,16 +4,27 @@ using System.Data;
 using System.Text;
 using System.Windows.Forms;
 using TrackerHelper.DB;
+using System.Runtime.Remoting.Messaging;
 
 namespace TrackerHelper.Controls
 {
     public partial class DashboardIssuesStatus : UserControl, IDashboardControlsUpdate
     {
+        delegate DataTable DataTableDel(int hoursFrom, int hoursTo, int hoursToOverdue);
+        delegate void UpdateDataSet(DataTable dt);
+
+        public delegate void IsEmpty();
+        public event IsEmpty onEmpty;
+
+
         static string _dateFormat = "yyyy-MM-dd HH:mm:ss:fff";
         private int[] _userIdArray = new int[] { 1 };
         private int[] _statusIdArray = new int[] { 1 };
         private int[] _projectIdArray = new int[] { 1 };
         private int _hoursToOverdue = 0;
+        //private DataTable _DgvDataTable;
+        private bool isDone = false;
+        private bool isEmpty = false;
 
         public int[] UserIdList
         {
@@ -51,11 +62,40 @@ namespace TrackerHelper.Controls
         {
             InitializeComponent();
         }
-        
-        public void GetDataTable()
-        {
 
-            dgvIssuesStatus.DataSource = CheckStatusOverdue(10, 20, HoursToOverdue);
+        private void GetDataTable()
+        {
+            DataTableDel del = new DataTableDel(CheckStatusOverdue);
+            IAsyncResult iAsyncResult = del.BeginInvoke(10, 20, HoursToOverdue, null, null);
+            SetDataGridViewDataset(del.EndInvoke(iAsyncResult));
+            isDone = true;
+        }
+
+        private void SetDataGridViewDataset(DataTable dt)
+        {
+            if (dgvIssuesStatus.InvokeRequired)
+            {
+                UpdateDataSet lblup = new UpdateDataSet(SetDataGridViewDataset);
+                Invoke(lblup, new object[] { dt });
+            }
+            else
+            {
+                dgvIssuesStatus.DataSource = dt;
+            }
+        }
+
+        private void ShowData()//IAsyncResult iAsyncResult)
+        {
+            /* AsyncResult asyncResult = (AsyncResult)iAsyncResult;
+             DataTableDel del = (DataTableDel)asyncResult.AsyncDelegate;
+
+             SetDataGridViewDataset(del.EndInvoke(iAsyncResult));*/
+
+            if (dgvIssuesStatus.Rows[0].Cells[0].Value == null)
+            {
+                isEmpty = true;
+                onEmpty();
+            }
 
             dgvIssuesStatus.ClearSelection();
             dgvIssuesStatus.BackgroundColor = Color.FromArgb(43, 51, 65);
@@ -181,7 +221,7 @@ namespace TrackerHelper.Controls
                 Hours += Now.Hour + 1;
             }
             if (Now.DayOfWeek == DayOfWeek.Sunday)
-            {// 1 - 1 - компенсация за минуты больше указанного часа.
+            {// 1 - компенсация за минуты больше указанного часа.
                 Hours += 24 + Now.Hour + 1;
             }
 
@@ -198,7 +238,7 @@ namespace TrackerHelper.Controls
                     Hours += dayStartHour + 24 - dayEndHour + dayStartHour - Now.AddHours(-Hours).Hour;
                 }
                 else if (Now.AddHours(-Hours - workDayPart).Hour > dayEndHour)
-                { // 1 - 1 - компенсация за минуты больше указанного часа.
+                { // 1 - компенсация за минуты больше указанного часа.
                     Hours += Now.AddHours(-Hours - workDayPart).Hour + 1 - dayEndHour;
                 }
                 else
@@ -208,14 +248,20 @@ namespace TrackerHelper.Controls
                 }
             }
             while (workDayPart > 0);
-            return Hours;
-            
+            return Hours;            
         }
 
         public void ControlUpdate()
         {
+            isDone = false;
             GetDataTable();
-            BringToFront();
+            while (!isDone)
+            {                
+            }
+            ShowData();
+
+            if (!isEmpty)
+                BringToFront();
         }
     }
 }
